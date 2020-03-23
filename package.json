@@ -1,0 +1,17 @@
+{
+  "name": "bancor-fiat-on-ramp",
+  "version": "0.1.0",
+  "description": "Fiat on/off ramps for entering/exiting Bancor liquidity pools",
+  "main": "index.js",
+  "scripts": {
+    "ganache": "source .env && ganache-cli -d -f https://mainnet.infura.io/v3/$INFURA_ID -u $EXCHANGE_ADDRESS -u $WETH_HOLDER_ADDRESS",
+    "test": "source .env && npx truffle test"
+  },
+  "license": "MIT",
+  "dependencies": {},
+  "peerDependencies": {},
+  "devDependencies": {
+    "@openzeppelin/contracts": "^3.0.0-rc.0",
+    "solhint": "^2.3.1"
+  }
+}
