@@ -21,7 +21,7 @@
         v-else
         class="row justify-center "
       >
-        TODO
+        <deposit-with-wyre />
       </div>
     </div>
   </q-page>
@@ -30,18 +30,20 @@
 <script>
 import { mapState } from 'vuex';
 import ConnectWallet from 'components/ConnectWallet';
+import DepositWithWyre from 'components/DepositWithWyre';
 
 export default {
   name: 'PageIndex',
+
+  components: {
+    ConnectWallet,
+    DepositWithWyre,
+  },
 
   computed: {
     ...mapState({
       userAddress: (state) => state.main.userAddress,
     }),
-  },
-
-  components: {
-    ConnectWallet,
   },
 };
 </script>
