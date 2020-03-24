@@ -1,10 +1,31 @@
 <template>
-  <q-btn
-    label="Connect Wallet to Get Started"
-    color="primary"
-    :loading="isLoading"
-    @click="connectWallet()"
-  />
+  <div>
+    <!-- Connect Wallet -->
+    <div class="q-mb-xl">
+      <h4 class="q-mb-md">
+        Have a Wallet?
+      </h4>
+      <q-btn
+        label="Connect Wallet to Get Started"
+        color="primary"
+        :loading="isMainLoading"
+        @click="connectWallet()"
+      />
+    </div>
+    <!-- Create new wallet -->
+    <div>
+      <h4 class="q-mb-md">
+        Need a Wallet?
+      </h4>
+      <p>Use Torus to connect with Google, Facebook, Reddit, Discord, or Twitch</p>
+      <q-btn
+        label="Connect Account"
+        color="primary"
+        :loading="isBackupLoading"
+        @click="connectWallet()"
+      />
+    </div>
+  </div>
 </template>
 
 <script>
@@ -13,16 +34,28 @@ import { ethers } from 'ethers';
 import Onboard from 'bnc-onboard';
 
 let provider;
-const walletOptions = {
-  // ..... options here
-};
+const allWallets = [
+  { walletName: 'metamask' },
+  { walletName: 'torus' },
+  { walletName: 'fortmatic', apiKey: process.env.FORTMATIC_API_KEY },
+  { walletName: 'walletConnect', infuraKey: process.env.INFURA_ID },
+  { walletName: 'portis', apiKey: process.env.PORTIS_API_KEY },
+  { walletName: 'authereum' },
+  { walletName: 'squarelink', apiKey: process.env.SQUARELINK_API_KEY },
+  { walletName: 'opera' },
+  { walletName: 'dapper' },
+];
+const easyWallets = [
+  { walletName: 'torus' },
+];
 
 export default {
   name: 'ConnectWallet',
 
   data() {
     return {
-      isLoading: false,
+      isMainLoading: false,
+      isBackupLoading: false,
     };
   },
 
@@ -34,21 +67,35 @@ export default {
   },
 
   methods: {
-    async connectWallet() {
+    async connectWallet(isEasy = false) {
       try {
-        this.isLoading = true;
         // Prompt user to connect wallet of their choice
-        const onboard = Onboard({
-          ...walletOptions,
-          dappId: process.env.BLOCKNATIVE_API_KEY, // [String] The API key created by step one above
-          networkId: 1, // [Integer] The Ethereum network ID your Dapp uses.
-          darkMode: Boolean(this.$q.localStorage.getItem('isDark')),
-          subscriptions: {
-            wallet: (wallet) => {
-              provider = new ethers.providers.Web3Provider(wallet.provider);
+        let onboard;
+        if (!isEasy) {
+          this.isMainLoading = true;
+          // Show all wallets
+          onboard = Onboard({
+            walletSelect: { wallets: allWallets },
+            dappId: process.env.BLOCKNATIVE_API_KEY, // [String] The API key created by step one above
+            networkId: 1, // [Integer] The Ethereum network ID your Dapp uses.
+            darkMode: Boolean(this.$q.localStorage.getItem('isDark')),
+            subscriptions: {
+              wallet: (wallet) => { provider = new ethers.providers.Web3Provider(wallet.provider); },
             },
-          },
-        });
+          });
+        } else {
+          // Show only Torus
+          this.isBackupLoading = true;
+          onboard = Onboard({
+            walletSelect: { wallets: easyWallets },
+            dappId: process.env.BLOCKNATIVE_API_KEY, // [String] The API key created by step one above
+            networkId: 1, // [Integer] The Ethereum network ID your Dapp uses.
+            darkMode: Boolean(this.$q.localStorage.getItem('isDark')),
+            subscriptions: {
+              wallet: (wallet) => { provider = new ethers.providers.Web3Provider(wallet.provider); },
+            },
+          });
+        }
         await onboard.walletSelect();
         await onboard.walletCheck();
         // Update state with signer info
@@ -58,9 +105,10 @@ export default {
         // the selected wallet
         // this.ESRedemption = new ethers.Contract(addresses.ESRedemption, abi, signer);
       } catch (err) {
-        console.error(err);
+        console.error(err); // eslint-disable-line no-console
       } finally {
-        this.isLoading = false;
+        this.isMainLoading = false;
+        this.isBackupLoading = false;
       }
     },
   },
