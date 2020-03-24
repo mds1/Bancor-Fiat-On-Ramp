@@ -4,11 +4,16 @@
   "description": "Fiat on/off ramps for entering/exiting Bancor liquidity pools",
   "main": "index.js",
   "scripts": {
-    "ganache": "source .env && ganache-cli -d -f https://mainnet.infura.io/v3/$INFURA_ID -u $EXCHANGE_ADDRESS -u $WETH_HOLDER_ADDRESS",
+    "ganache": "source .env && ganache-cli -d -f https://mainnet.infura.io/v3/$INFURA_ID",
     "test": "source .env && npx truffle test"
   },
   "license": "MIT",
-  "dependencies": {},
+  "dependencies": {
+    "@openzeppelin/test-helpers": "^0.5.5",
+    "dotenv": "^8.2.0",
+    "truffle": "^5.1.18",
+    "truffle-hdwallet-provider": "^1.0.17"
+  },
   "peerDependencies": {},
   "devDependencies": {
     "@openzeppelin/contracts": "^3.0.0-rc.0",
