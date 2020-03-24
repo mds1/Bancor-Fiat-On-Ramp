@@ -10,76 +10,18 @@
 <script>
 import { mapState } from 'vuex';
 import { ethers } from 'ethers';
-import Web3Modal from 'web3modal';
-import WalletConnectProvider from '@walletconnect/web3-provider';
-import Portis from '@portis/web3';
-import Fortmatic from 'fortmatic';
-import Squarelink from 'squarelink';
-import Torus from '@toruslabs/torus-embed';
-import Arkane from '@arkane-network/web3-arkane-provider';
-import Authereum from 'authereum';
-import BurnerConnectProvider from '@burner-wallet/burner-connect-provider';
+import Onboard from 'bnc-onboard';
 
-const addresses = require('src/addresses.json');
-const abi = require('src/abi/ESRedemption.json');
-
-const providerOptions = {
-  walletconnect: {
-    package: WalletConnectProvider,
-    options: {
-      infuraId: process.env.INFURA_ID,
-    },
-  },
-  portis: {
-    package: Portis,
-    options: {
-      id: process.env.PORTIS_ID,
-    },
-  },
-  fortmatic: {
-    package: Fortmatic,
-    options: {
-      key: process.env.FORTMATIC_KEY,
-    },
-  },
-  squarelink: {
-    package: Squarelink,
-    options: {
-      id: process.env.SQUARELINK_ID,
-    },
-  },
-  torus: {
-    package: Torus, // required
-    options: {},
-  },
-  arkane: {
-    package: Arkane, // required
-    options: {
-      clientId: process.env.ARKANE_CLIENT_ID,
-    },
-  },
-  authereum: {
-    package: Authereum, // required
-    options: {},
-  },
-  burnerconnect: {
-    package: BurnerConnectProvider, // required
-    options: {},
-  },
+let provider;
+const walletOptions = {
+  // ..... options here
 };
-
-const web3Modal = new Web3Modal({
-  network: 'mainnet',
-  cacheProvider: false, // always require suer to choose provider
-  providerOptions,
-});
 
 export default {
   name: 'ConnectWallet',
 
   data() {
     return {
-      ESRedemption: undefined, // contract instance for user
       isLoading: false,
     };
   },
@@ -93,16 +35,33 @@ export default {
 
   methods: {
     async connectWallet() {
-      this.isLoading = true;
-      // Prompt user to connect wallet of their choice
-      const web3provider = await web3Modal.connect();
-      const provider = new ethers.providers.Web3Provider(web3provider);
-      const signer = provider.getSigner();
-      await this.$store.dispatch('main/setWallet', signer);
-      // Now we have a contract instance to use for sending transactions from
-      // the selected wallet
-      this.ESRedemption = new ethers.Contract(addresses.ESRedemption, abi, signer);
-      this.isLoading = false;
+      try {
+        this.isLoading = true;
+        // Prompt user to connect wallet of their choice
+        const onboard = Onboard({
+          ...walletOptions,
+          dappId: process.env.BLOCKNATIVE_API_KEY, // [String] The API key created by step one above
+          networkId: 1, // [Integer] The Ethereum network ID your Dapp uses.
+          darkMode: Boolean(this.$q.localStorage.getItem('isDark')),
+          subscriptions: {
+            wallet: (wallet) => {
+              provider = new ethers.providers.Web3Provider(wallet.provider);
+            },
+          },
+        });
+        await onboard.walletSelect();
+        await onboard.walletCheck();
+        // Update state with signer info
+        const signer = provider.getSigner();
+        await this.$store.dispatch('main/setWallet', signer);
+        // Now we have a contract instance to use for sending transactions from
+        // the selected wallet
+        // this.ESRedemption = new ethers.Contract(addresses.ESRedemption, abi, signer);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        this.isLoading = false;
+      }
     },
   },
 };

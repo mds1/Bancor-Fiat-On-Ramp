@@ -46,7 +46,9 @@ module.exports = function (ctx) {
       directives: [],
 
       // Quasar plugins
-      plugins: [],
+      plugins: [
+        'LocalStorage',
+      ],
     },
 
     // https://quasar.dev/quasar-cli/cli-documentation/supporting-ie
@@ -77,6 +79,15 @@ module.exports = function (ctx) {
           },
         });
       },
+      env: ctx.dev
+        ? { // so on dev we'll have these environment variables
+          INFURA_ID: JSON.stringify(process.env.INFURA_ID),
+          BLOCKNATIVE_API_KEY: JSON.stringify(process.env.BLOCKNATIVE_API_KEY),
+        }
+        : { // and on build (production) we'll have these:
+          INFURA_ID: JSON.stringify(process.env.INFURA_ID),
+          BLOCKNATIVE_API_KEY: JSON.stringify(process.env.BLOCKNATIVE_API_KEY),
+        },
     },
 
     // Full list of options: https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-devServer

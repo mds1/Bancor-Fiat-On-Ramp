@@ -32,9 +32,6 @@
             >
               Address: {{ userAddress }}
             </div>
-            <div class="text-caption text-right dark-toggle">
-              Block: {{ blockNumber }}
-            </div>
           </div>
 
           <div class="row justify-end q-mt-xs">
@@ -98,20 +95,14 @@ export default {
 
   computed: {
     ...mapState({
-      blockNumber: (state) => state.main.data.blockNumber,
-      networkId: (state) => state.main.data.networkId,
       userAddress: (state) => state.main.userAddress,
     }),
   },
 
   created() {
     // Check local storage for a dark mode setting
-    try {
-      const isDark = this.$q.localStorage.getItem('isDark');
-      this.$q.dark.set(isDark);
-    } catch (err) {
-      console.log('Dark mode setting not found in local storage'); // eslint-disable-line no-console
-    }
+    const isDark = this.$q.localStorage.getItem('isDark');
+    this.$q.dark.set(isDark);
   },
 
   methods: {

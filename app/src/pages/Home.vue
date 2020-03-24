@@ -28,7 +28,20 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
+import ConnectWallet from 'components/ConnectWallet';
+
 export default {
   name: 'PageIndex',
+
+  computed: {
+    ...mapState({
+      userAddress: (state) => state.main.userAddress,
+    }),
+  },
+
+  components: {
+    ConnectWallet,
+  },
 };
 </script>
