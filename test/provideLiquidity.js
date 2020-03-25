@@ -42,11 +42,9 @@ contract("Provide Liquidity", accounts => {
 
   // ======================================= Initialization ========================================
   it("deploys properly", async () => {
-    console.log(2);
     expect(ProvideLiquidityContract.address.startsWith("0x")).to.be.true;
     expect(BancorConverterContract.address.startsWith("0x")).to.be.true;
     expect(await ProvideLiquidityContract.bancorConverter()).to.equal( bancorConverter );
-    console.log(5);
   });
 
   // it("lets users provide liquidity", async () => {

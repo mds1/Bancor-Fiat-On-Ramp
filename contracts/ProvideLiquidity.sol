@@ -25,15 +25,28 @@ platform fee from trades.
 */
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/upgrades/contracts/Initializable.sol";
 import "./IBancorConverter.sol";
 
-contract ProvideLiquidity {
+contract ProvideLiquidity is Initializable {
 
+  address public user;
   IBancorConverter public bancorConverter;
+
+  event UserSet(address indexed user);
 
   constructor() public {
     // Create instance of Bancor Converter
     bancorConverter = IBancorConverter(0xA2cAF0d7495360CFa58DeC48FaF6B4977cA3DF93);
+  }
+
+  /**
+   * @notice Set the address of the user who this contract is for
+   * @dev initializer modifier ensures this can only be called once
+   */
+  function setUser(address _user) external initializer {
+    emit UserSet(_user);
+    user = _user;
   }
 
   /**
