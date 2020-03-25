@@ -22,8 +22,40 @@ fees for liquidity providers.
 Currently, whoever initiates the Relay determines its fees, while in the future,
 liquidity providers will be able to vote on the Relay’s fee. Bancor takes no
 platform fee from trades.
- */
+*/
+
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "./IBancorConverter.sol";
 
 contract ProvideLiquidity {
+
+  IBancorConverter public bancorConverter;
+
+  constructor() public {
+    // Create instance of Bancor Converter
+    bancorConverter = IBancorConverter(0xA2cAF0d7495360CFa58DeC48FaF6B4977cA3DF93);
+  }
+
+  /**
+   * @notice Main function to provide liquidity
+   * @dev NOT YET TESTED DUE TO GANACHE BUG
+   */
+  function provideLiquidity(address _from, address _to, uint256 _amount) external {
+    // Get contract instances
+    IERC20 _fromToken = IERC20(_from);
+    IERC20 _toToken = IERC20(_to);
+
+    // Transfer token from user to this contract
+    _fromToken.transferFrom(msg.sender, address(this), _amount);
+
+    // Approve Bancor converter to spend our fromToken
+    _fromToken.approve(address(bancorConverter), _amount);
+
+    // Do the conversion
+    uint256 _minReturn = 1; // minimum tokens expected in return
+    address _affiliate = 0x60A5dcB2fC804874883b797f37CbF1b0582ac2dD;
+    uint256 _fee = 1000000; // fee, in PPM, so this equals 1%
+    bancorConverter.convert2(_fromToken, _toToken, _amount, _minReturn, _affiliate, _fee);
+  }
 
 }
