@@ -20,7 +20,6 @@ contract("Provide Liquidity", accounts => {
   // Users
   const bancor = accounts[0];
   const alice = accounts[1];
-  const exchange = process.env.EXCHANGE_ADDRESS;
 
   // Addresses
   let factory;

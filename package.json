@@ -4,7 +4,7 @@
   "description": "Fiat on/off ramps for entering/exiting Bancor liquidity pools",
   "main": "index.js",
   "scripts": {
-    "ganache": "source .env && ganache-cli -d -f https://mainnet.infura.io/v3/$INFURA_ID -u $EXCHANGE_ADDRESS",
+    "ganache": "source .env && ganache-cli -d -f https://mainnet.infura.io/v3/$INFURA_ID -u $DAI_ADDRESS -u $BNT_ADDRESS",
     "test": "source .env && npx truffle test"
   },
   "license": "MIT",

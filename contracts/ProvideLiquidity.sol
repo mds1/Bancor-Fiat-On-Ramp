@@ -1,43 +1,37 @@
 pragma solidity ^0.6.0;
 
 /**
-Providing Liquidity on Bancor
-source: https://docs.bancor.network/api-reference/ethereum-smart-contracts
-
-Anyone can become a liquidity provider to a Relay and contribute to its reserves.
-This is different than buying tokens on Bancor. It requires staking tokens in a
-Relay. Users can stake their tokens in a Relay by buying “Relay Tokens” on
-bancor.network, or through any third-party liquidity portal built atop the Bancor
-Protocol. Relay Tokens can be sold at any time to withdraw a proportional share
-of the Relay’s liquidity.
-
-Each time a Relay processes a conversion, a small liquidity provider fee (usually
-0.1-0.3%) is taken out of each trade and deposited into the Relay’s reserves.
-These fees function as an incentive for liquidity providers who can withdraw
-their proportional share of the reserves including the accumulated fees. The
-larger a Relay’s reserves, the lower the slippage costs incurred by traders
-transacting with the Relay, driving more conversion volume and, in turn, more
-fees for liquidity providers.
-
-Currently, whoever initiates the Relay determines its fees, while in the future,
-liquidity providers will be able to vote on the Relay’s fee. Bancor takes no
-platform fee from trades.
-*/
+ * @notice This contract only lets the user supply ETH to
+ * the Bancor liquidity pool
+ */
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/upgrades/contracts/Initializable.sol";
 import "./IBancorConverter.sol";
+import "./IBancorNetwork.sol";
+import "./IEtherToken.sol";
 
 contract ProvideLiquidity is Initializable {
 
   address public user;
-  IBancorConverter public bancorConverter;
+
+  IBancorNetwork public constant BancorNetwork =
+    IBancorNetwork(0x3Ab6564d5c214bc416EE8421E05219960504eeAD);
+
+  IBancorConverter public constant BancorConverter =
+    IBancorConverter(0xd3ec78814966Ca1Eb4c923aF4Da86BF7e6c743bA);
+
+  IEtherToken public constant EtherToken = IEtherToken(0xc0829421C1d260BD3cB3E0F06cfE2D52db2cE315);
+  IERC20 public constant EtherTokenIERC20 = IERC20(0xc0829421C1d260BD3cB3E0F06cfE2D52db2cE315);
+  IERC20 public constant BntToken = IERC20(0x1F573D6Fb3F13d689FF844B4cE37794d79a7FF1C);
+  IERC20 public constant EthBntToken = IERC20(0xb1CD6e4153B2a390Cf00A6556b0fC1458C4A5533);
 
   event UserSet(address indexed user);
 
   constructor() public {
-    // Create instance of Bancor Converter
-    bancorConverter = IBancorConverter(0xA2cAF0d7495360CFa58DeC48FaF6B4977cA3DF93);
+    // Approvals
+    EtherToken.approve(address(BancorConverter), uint256(-1));
+    BntToken.approve(address(BancorConverter), uint256(-1));
   }
 
   /**
@@ -49,26 +43,55 @@ contract ProvideLiquidity is Initializable {
     user = _user;
   }
 
+
   /**
-   * @notice Main function to provide liquidity
-   * @dev NOT YET TESTED DUE TO GANACHE BUG
+   * @notice Swap Ether for Bancor's Ether Token
    */
-  function provideLiquidity(address _from, address _to, uint256 _amount) external {
-    // Get contract instances
-    IERC20 _fromToken = IERC20(_from);
-    IERC20 _toToken = IERC20(_to);
+  function swapEtherForEtherToken() internal {
+    uint256 _amount = msg.value / 2; // use half of the Ether
+    EtherToken.deposit.value(_amount)();
+  }
 
-    // Transfer token from user to this contract
-    _fromToken.transferFrom(msg.sender, address(this), _amount);
+  /**
+   * @notice Swap half of the Ether Tokens held by this contract for BNT
+   */
+  function swapEtherForBnt() internal {
+    // Define conversion path
+    IERC20[] memory _path = new IERC20[](3);
+    (_path[0], _path[1], _path[2]) = (EtherTokenIERC20, EthBntToken, BntToken);
 
-    // Approve Bancor converter to spend our fromToken
-    _fromToken.approve(address(bancorConverter), _amount);
+    // Define other swap parameters
+    uint256 _amount = msg.value / 2; // use half of the Ether
+    uint256 _minReturn = 1; // TODO update this
+    address _affiliate = 0x0000000000000000000000000000000000000000;
+    uint256 _fee = 0;
 
-    // Do the conversion
-    uint256 _minReturn = 1; // minimum tokens expected in return
-    address _affiliate = 0x60A5dcB2fC804874883b797f37CbF1b0582ac2dD;
-    uint256 _fee = 1000000; // fee, in PPM, so this equals 1%
-    bancorConverter.convert2(_fromToken, _toToken, _amount, _minReturn, _affiliate, _fee);
+    // Convert token
+    BancorNetwork.convert2.value(_amount)(_path, _amount, _minReturn, _affiliate, _fee);
+  }
+
+  /**
+   * @notice Enters user into Bancor's ETH liquidity pool.
+   */
+  function enterPool() external payable {
+    // Swap half of the Ether sent for BNT
+    swapEtherForBnt();
+
+    // Swap the other half of the Ether sent for EtherToken
+    swapEtherForEtherToken();
+
+    // Join the pool
+    uint256 _amount = 1000000000000000000; // TODO how to get this value?
+    BancorConverter.fund(_amount); // TODO this does not work
+  }
+
+  /**
+   * @notice Exits the pool
+   */
+  function exitPool() external {
+    // TODO
+    uint256 _amount = 1000000000000000000; // TODO how to get this value?
+    BancorConverter.liquidate(_amount); // TODO
   }
 
 }

@@ -8,12 +8,14 @@ Create a file at the project root called .env with the following contents:
 
 ```bash
 export INFURA_ID=yourInfuraId
-export EXCHANGE_ADDRESS=0x6262998Ced04146fA42253a5C0AF90CA02dfd2A3
+export DAI_ADDRESS=0x6262998Ced04146fA42253a5C0AF90CA02dfd2A3
+export BNT_ADDRESS=0xF977814e90dA44bFA03b6295A0616a897441aceC
 export MNEMONIC="your mnemonic"
 ```
 
-Here, `EXCHANGE_ADDRESS` is simply an account with many tokens used to
-acquire Dai, etc. for testing.
+Here, `DAI_ADDRESS` is simply an account with a lot of Dai used to
+acquire Dai, and `BNT_ADDRESS` is the same but for BNT. These addresses
+are used for testing.
 
 Next, create `app/.env` with the following contents:
 

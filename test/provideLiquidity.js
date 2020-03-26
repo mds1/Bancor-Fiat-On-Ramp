@@ -1,59 +1,61 @@
-const { BN, constants, expectRevert } = require("@openzeppelin/test-helpers");
+const { balance, BN, constants, ether, expectRevert } = require("@openzeppelin/test-helpers");
 const ProvideLiquidity = artifacts.require("ProvideLiquidity");
 const IBancorConverter = artifacts.require("IBancorConverter");
 const IERC20 = artifacts.require("IERC20");
+const IEtherToken = artifacts.require("IEtherToken");
 
 // Addresses
-const bancorConverter = "0xA2cAF0d7495360CFa58DeC48FaF6B4977cA3DF93";
-const dai = "0x6B175474E89094C44Da98b954EedeAC495271d0F";
-const daibnt = "0xee01b3AB5F6728adc137Be101d99c678938E6E72";
+const etherToken = "0xc0829421C1d260BD3cB3E0F06cfE2D52db2cE315";
+const bnt = "0x1F573D6Fb3F13d689FF844B4cE37794d79a7FF1C";
+const ethBnt = '0xb1CD6e4153B2a390Cf00A6556b0fC1458C4A5533';
 
 // Amounts
 const toWei = web3.utils.toWei;
-const amount = toWei("100").toString(); // default Dai amount
+const fromWei = web3.utils.fromWei;
+const initialEthAmount = ether('5'); // default Ether amount
 
 contract("Provide Liquidity", accounts => {
   // Contract instances
   let ProvideLiquidityContract;
+  let EtherTokenContract;
   let BancorConverterContract;
   let DaiContract;
 
   // Users
   const alice = accounts[1];
-  const exchange = process.env.EXCHANGE_ADDRESS;
+  const bntExchange = process.env.BNT_ADDRESS;
+
+  // Addresses
+  let provideLiquidity;
 
   beforeEach(async () => {
     // Deploy ProvideLiquidity instance
     ProvideLiquidityContract = await ProvideLiquidity.new();
+    provideLiquidity = ProvideLiquidityContract.address;
 
-    // Create instance of Bancor Converter contract
-    BancorConverterContract = await IBancorConverter.at(bancorConverter);
+    // Create contract instances
+    EtherTokenContract = await IEtherToken.at(etherToken);
+    BntTokenContract = await IERC20.at(bnt);
+    EthBntTokenContract = await IERC20.at(ethBnt);
 
-    // Create instance of Dai contract
-    DaiContract = await IERC20.at(dai);
-
-    // Send Dai to Alice
-    await DaiContract.transfer(alice, amount, { from: exchange });
-    expect((await DaiContract.balanceOf(alice)).toString()).to.equal(amount);
-
-    // Approve ProvideLiquidity contract to spend Alice's Dai
-    await DaiContract.approve(ProvideLiquidityContract.address, constants.MAX_UINT256, {from: alice});
   });
 
   // ======================================= Initialization ========================================
-  it("deploys properly", async () => {
+  it.skip("deploys properly", async () => {
     expect(ProvideLiquidityContract.address.startsWith("0x")).to.be.true;
-    expect(BancorConverterContract.address.startsWith("0x")).to.be.true;
-    expect(await ProvideLiquidityContract.bancorConverter()).to.equal( bancorConverter );
   });
 
-  // it("lets users provide liquidity", async () => {
-  //   // Provide liquidity
-  //   await ProvideLiquidityContract.provideLiquidity(dai, daibnt, amount, {from: alice});
-  // });
+  it('lets users enter the ETH liquidity pool', async() => {
+    await ProvideLiquidityContract.enterPool({from: alice, value: initialEthAmount, gasPrice: '1'});
+
+    const ethBntTokenBal = fromWei(await EthBntTokenContract.balanceOf(provideLiquidity));
+    console.log('ethBntTokenBal ', ethBntTokenBal);
+
+
+  })
 
   // after(async () => {
-  //   // Send all Dai back to the exchange
-  //   await DaiContract.transfer(exchange, await DaiContract.balanceOf(alice), { from: alice });
+  //   // Send all Dai back to the daiExchange
+  //   await DaiContract.transfer(daiExchange, await DaiContract.balanceOf(alice), { from: alice });
   // });
 });
