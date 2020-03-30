@@ -74,7 +74,7 @@
             target="_blank"
             class="hyperlink"
           >Matt Solomon</a>
-          for the Fiat On-Ramp For Liqudity Pools challenge of
+          for Bancor's Fiat On-Ramp For Liqudity Pools challenge of
           Gitcoin's Funding the Future Hackathon
         </div>
       </div>

@@ -38,11 +38,9 @@ contract("Provide Liquidity", accounts => {
 
   // ======================================= Initialization ========================================
   it("deploys properly", async () => {
-    // Check that factory was deployed properly
+    // Check that factory and logic template was deployed properly
     expect(factory.startsWith("0x")).to.be.true;
     expect(provideLiquidity.startsWith("0x")).to.be.true;
-    // Check that logic template was deployed properly
-    expect(await ProvideLiquidityContract.bancorConverter()).to.equal(bancorConverter);
   });
 
   // ======================================== Functionality ========================================
@@ -52,7 +50,7 @@ contract("Provide Liquidity", accounts => {
     // Get instance of the newly deployed proxy
     const proxy = await FactoryInstance.getContract(alice);
     const ProxyInstance = await ProvideLiquidity.at(proxy)
-    // Check parameters
+    // Ensure proxy was deployed properly and check parameters
     expect(await FactoryInstance.isClone(provideLiquidity, proxy)).to.be.true;
     expect(await ProxyInstance.user()).to.equal(alice)
     await expectEvent.inLogs(logs, 'ProxyCreated', { proxy, user: alice });

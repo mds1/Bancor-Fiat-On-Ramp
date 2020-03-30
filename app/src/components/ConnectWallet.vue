@@ -22,7 +22,7 @@
         label="Connect Account"
         color="primary"
         :loading="isBackupLoading"
-        @click="connectWallet()"
+        @click="connectWallet(true)"
       />
     </div>
   </div>

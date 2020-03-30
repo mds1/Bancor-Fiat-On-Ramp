@@ -41,7 +41,7 @@ export default {
       isLoading: false,
       contractAddress: undefined,
       pools: [
-        { label: 'DAI-BNT', value: 'dai-bnt' },
+        { label: 'ETH-BNT', value: 'eth-bnt' },
       ],
       // User options
       depositAmount: undefined,
@@ -65,7 +65,7 @@ export default {
         // Define and temporarily save off options used to load the widget
         const widgetOptions = {
           dest: `ethereum:${this.contractAddress}`,
-          destCurrency: 'DAI',
+          destCurrency: 'ETH',
           sourceAmount: this.depositAmount,
           // paymentMethod: paymentType,
           redirectUrl: widgetRedirectUrl,
