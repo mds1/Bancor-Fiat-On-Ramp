@@ -21,6 +21,7 @@ contract("Provide Liquidity", accounts => {
   let DaiContract;
 
   // Users
+  const bancor = accounts[0];
   const alice = accounts[1];
   const bntExchange = process.env.BNT_ADDRESS;
 
@@ -29,7 +30,8 @@ contract("Provide Liquidity", accounts => {
 
   beforeEach(async () => {
     // Deploy ProvideLiquidity instance
-    ProvideLiquidityContract = await ProvideLiquidity.new();
+    ProvideLiquidityContract = await ProvideLiquidity.new({ from: bancor });
+    ProvideLiquidityContract.setUser(alice, { from: bancor })
     provideLiquidity = ProvideLiquidityContract.address;
 
     // Create contract instances
@@ -40,17 +42,40 @@ contract("Provide Liquidity", accounts => {
   });
 
   // ======================================= Initialization ========================================
+
   it.skip("deploys properly", async () => {
     expect(ProvideLiquidityContract.address.startsWith("0x")).to.be.true;
   });
+
+  // ======================================== Authorization ========================================
+
+  it('only lets setUser be called once', async() => {
+    await expectRevert(
+      ProvideLiquidityContract.setUser(bancor, { from: bancor }),
+      "Contract instance has already been initialized"
+    );
+  })
+
+  it('only lets the user enter and exit pools', async() => {
+    await expectRevert(
+      ProvideLiquidityContract.enterPool({ from: bancor }),
+      "ProvideLiquidity: Caller is not authorized"
+    );
+    await expectRevert(
+      ProvideLiquidityContract.exitPool(ether('5'),  { from: bancor }),
+      "ProvideLiquidity: Caller is not authorized"
+    );
+  })
+
+  // ======================================== Functionality ========================================
 
   it('lets users enter the ETH liquidity pool', async() => {
     // Initial balance should be zero
     expect(fromWei(await EthBntContract.balanceOf(provideLiquidity))).to.equal('0')
 
     // Enter liquidity pool ------------------------------------------------
-    // Send Ether to contract (sent from random address to represent Wyre)
-    await send.ether(accounts[0], provideLiquidity, ether('5'));
+    // Send Ether to contract (sent from Bancor but used to represent Wyre)
+    await send.ether(bancor, provideLiquidity, ether('5'));
 
     // Enter pool
     await ProvideLiquidityContract.enterPool({from: alice, gasPrice: '1'});

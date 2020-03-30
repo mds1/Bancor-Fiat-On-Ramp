@@ -14,22 +14,27 @@ import "./IEtherToken.sol";
 
 contract ProvideLiquidity is Initializable {
 
+  // User is effectively the contract owner. All funds in this contract
+  // are only for the user
   address public user;
 
+  // Contracts needed to interact with Bancor
   IBancorNetwork public constant BancorNetwork =
     IBancorNetwork(0x3Ab6564d5c214bc416EE8421E05219960504eeAD);
-
   IBancorConverter public constant BancorConverter =
     IBancorConverter(0xd3ec78814966Ca1Eb4c923aF4Da86BF7e6c743bA);
-
   IBancorFormula public constant BancorFormula =
     IBancorFormula(0x524619EB9b4cdFFa7DA13029b33f24635478AFc0);
 
+  // Supported tokens
   IEtherToken public constant EtherToken = IEtherToken(0xc0829421C1d260BD3cB3E0F06cfE2D52db2cE315);
   IERC20 public constant EtherTokenIERC20 = IERC20(0xc0829421C1d260BD3cB3E0F06cfE2D52db2cE315);
   IERC20 public constant BntToken = IERC20(0x1F573D6Fb3F13d689FF844B4cE37794d79a7FF1C);
   IERC20 public constant EthBntToken = IERC20(0xb1CD6e4153B2a390Cf00A6556b0fC1458C4A5533);
 
+  /**
+   * @notice Emitted when the user is specified
+   */
   event UserSet(address indexed user);
 
   constructor() public {
@@ -39,6 +44,11 @@ contract ProvideLiquidity is Initializable {
     // Approvals
     EtherToken.approve(address(BancorConverter), uint256(-1));
     BntToken.approve(address(BancorConverter), uint256(-1));
+  }
+
+  modifier onlyUser() {
+    require(user == msg.sender, "ProvideLiquidity: Caller is not authorized");
+    _;
   }
 
   /**
@@ -106,7 +116,7 @@ contract ProvideLiquidity is Initializable {
   /**
    * @notice Enters user into Bancor's ETH liquidity pool.
    */
-  function enterPool() external {
+  function enterPool() external onlyUser {
     // Swap half of the Ether sent for BNT
     swapEtherForBnt();
 
@@ -124,7 +134,7 @@ contract ProvideLiquidity is Initializable {
    * @notice Exits the pool
    * @param _amount Amount of pool tokens to redeem
    */
-  function exitPool(uint256 _amount) external {
+  function exitPool(uint256 _amount) external onlyUser {
     // Transfer pool tokens from user to this contract
     EthBntToken.transferFrom(msg.sender, address(this), _amount);
 
