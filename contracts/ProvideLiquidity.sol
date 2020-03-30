@@ -32,19 +32,28 @@ contract ProvideLiquidity is Initializable {
   IERC20 public constant BntToken = IERC20(0x1F573D6Fb3F13d689FF844B4cE37794d79a7FF1C);
   IERC20 public constant EthBntToken = IERC20(0xb1CD6e4153B2a390Cf00A6556b0fC1458C4A5533);
 
+  // ===============================================================================================
+  //                                          Events
+  // ===============================================================================================
+
   /**
-   * @notice Emitted when the user is specified
+   * @notice Emitted when the contract is initialized
    */
-  event UserSet(address indexed user);
+  event Initialized(address indexed user);
 
-  constructor() public {
-    // TODO move approvals into setUser to ensure they're called upon
-    // deployment of a proxy
+  /**
+   * @dev Emitted when a token is withdrawn without being converted to Chai
+   */
+  event TokensWithdrawn(uint256 indexed amount, address token);
 
-    // Approvals
-    EtherToken.approve(address(BancorConverter), uint256(-1));
-    BntToken.approve(address(BancorConverter), uint256(-1));
-  }
+  /**
+   * @dev Emitted when Ether is withdrawn without being converted to Chai
+   */
+  event EtherWithdrawn(uint256 indexed amount);
+
+  // ===============================================================================================
+  //                                      Main Functionality
+  // ===============================================================================================
 
   modifier onlyUser() {
     require(user == msg.sender, "ProvideLiquidity: Caller is not authorized");
@@ -52,14 +61,18 @@ contract ProvideLiquidity is Initializable {
   }
 
   /**
-   * @notice Set the address of the user who this contract is for
+   * @notice Set the address of the user who this contract is for and
+   * executes token approvals
    * @dev initializer modifier ensures this can only be called once
    */
-  function setUser(address _user) external initializer {
-    emit UserSet(_user);
+  function initialize(address _user) external initializer {
+    emit Initialized(_user);
     user = _user;
-  }
 
+    // Approvals
+    EtherToken.approve(address(BancorConverter), uint256(-1));
+    BntToken.approve(address(BancorConverter), uint256(-1));
+  }
 
   /**
    * @notice Swap Ether for Bancor's Ether Token
@@ -152,4 +165,38 @@ contract ProvideLiquidity is Initializable {
    * See: https://solidity.readthedocs.io/en/v0.6.4/contracts.html#receive-ether-function
    */
   receive() external payable {}
+
+  // ===============================================================================================
+  //                                          Escape Hatches
+  // ===============================================================================================
+
+  /**
+   * @notice Forwards all tokens to owner
+   * @dev This is useful if tokens get stuck
+   * @param _tokenAddress address of token to send
+   */
+  function withdrawTokens(address _tokenAddress) external onlyUser {
+    IERC20 _token = IERC20(_tokenAddress);
+    uint256 _balance = _token.balanceOf(address(this));
+    emit TokensWithdrawn(_balance, _tokenAddress);
+
+    _token.transfer(user, _balance);
+  }
+
+  /**
+   * @notice Forwards all Ether to owner
+   * @dev This is useful if Ether gets stuck
+   */
+  function withdrawEther() external onlyUser {
+    uint256 _balance = address(this).balance;
+    emit EtherWithdrawn(_balance);
+
+    // Note: Even though this transfers control to the recipient, we do not have to worry
+    // about reentrancy here. This is because:
+    //   1. This function can only be called by the user
+    //   2. All Ether sent to this contract should belong to the user anyway, so
+    //      there is no way for reentrancy to enable the owner/attacker to send
+    //       more Ether to themselves.
+    payable(user).transfer(_balance);
+  }
 }

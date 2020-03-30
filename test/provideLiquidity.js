@@ -8,6 +8,7 @@ const IEtherToken = artifacts.require("IEtherToken");
 const etherToken = "0xc0829421C1d260BD3cB3E0F06cfE2D52db2cE315";
 const bnt = "0x1F573D6Fb3F13d689FF844B4cE37794d79a7FF1C";
 const ethBnt = '0xb1CD6e4153B2a390Cf00A6556b0fC1458C4A5533';
+const dai = '0x6B175474E89094C44Da98b954EedeAC495271d0F'
 
 // Amounts
 const toWei = web3.utils.toWei;
@@ -24,6 +25,7 @@ contract("Provide Liquidity", accounts => {
   const bancor = accounts[0];
   const alice = accounts[1];
   const bntExchange = process.env.BNT_ADDRESS;
+  const daiExchange = process.env.DAI_ADDRESS;
 
   // Addresses
   let provideLiquidity;
@@ -31,27 +33,28 @@ contract("Provide Liquidity", accounts => {
   beforeEach(async () => {
     // Deploy ProvideLiquidity instance
     ProvideLiquidityContract = await ProvideLiquidity.new({ from: bancor });
-    ProvideLiquidityContract.setUser(alice, { from: bancor })
+    ProvideLiquidityContract.initialize(alice, { from: bancor })
     provideLiquidity = ProvideLiquidityContract.address;
-
+``
     // Create contract instances
-    EtherContract = await IEtherToken.at(etherToken);
     BntContract = await IERC20.at(bnt);
+    DaiContract = await IERC20.at(dai);
     EthBntContract = await IERC20.at(ethBnt);
+    EtherContract = await IEtherToken.at(etherToken);
 
   });
 
   // ======================================= Initialization ========================================
 
-  it.skip("deploys properly", async () => {
+  it("deploys properly", async () => {
     expect(ProvideLiquidityContract.address.startsWith("0x")).to.be.true;
   });
 
   // ======================================== Authorization ========================================
 
-  it('only lets setUser be called once', async() => {
+  it('only lets contract be initialized once', async() => {
     await expectRevert(
-      ProvideLiquidityContract.setUser(bancor, { from: bancor }),
+      ProvideLiquidityContract.initialize(bancor, { from: bancor }),
       "Contract instance has already been initialized"
     );
   })
@@ -66,6 +69,20 @@ contract("Provide Liquidity", accounts => {
       "ProvideLiquidity: Caller is not authorized"
     );
   })
+
+  it('only lets the user withdraw stray tokens', async () => {
+    await expectRevert(
+      ProvideLiquidityContract.withdrawTokens(bnt, { from: bancor }),
+      "ProvideLiquidity: Caller is not authorized",
+    );
+  });
+
+  it('only lets the user withdraw stray Ether', async () => {
+    await expectRevert(
+      ProvideLiquidityContract.withdrawEther({ from: bancor }),
+      "ProvideLiquidity: Caller is not authorized",
+    );
+  });
 
   // ======================================== Functionality ========================================
 
@@ -120,4 +137,28 @@ contract("Provide Liquidity", accounts => {
     expect(parseFloat(fromWei(await EtherContract.balanceOf(alice)))).to.be.above(0)
     expect(parseFloat(fromWei(await BntContract.balanceOf(alice)))).to.be.above(0)
   })
+
+  it('allows stray ERC20 tokens to be withdrawn', async () => {
+    // Send DAI to the proxy contract
+    const daiAmount = ether('0.1');
+    await DaiContract.transfer(provideLiquidity, daiAmount, { from: daiExchange });
+    expect( (await DaiContract.balanceOf(provideLiquidity)).toString())
+      .to.be.equal(daiAmount.toString());
+
+    // Withdraw the Dai to Alice's wallet and check result
+    await ProvideLiquidityContract.withdrawTokens(dai, { from: alice });
+    expect((await DaiContract.balanceOf(alice)).toString()).to.equal(daiAmount.toString());
+  });
+
+  it('allows stray Ether to be withdrawn', async () => {
+    // Send Ether to the forwarder contract
+    await send.ether(bancor, provideLiquidity, ether('1'));
+    expect((await balance.current(provideLiquidity, 'ether')).toString()).to.equal('1');
+
+    // Withdraw the Ether and check result
+    const initialBalance = (await balance.current(alice)).toString(); // get initial ETH balance
+    await ProvideLiquidityContract.withdrawEther({ from: alice });
+    const newBalance = (await balance.current(alice)).toString(); // get updated ETH balance
+    expect(parseFloat(newBalance)).to.be.above(parseFloat(initialBalance));
+  });
 });
