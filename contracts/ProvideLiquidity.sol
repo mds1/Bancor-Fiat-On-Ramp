@@ -55,7 +55,7 @@ contract ProvideLiquidity is Initializable {
    * @notice Swap Ether for Bancor's Ether Token
    */
   function swapEtherForEtherToken() internal {
-    uint256 _amount = msg.value / 2; // use half of the Ether
+    uint256 _amount = address(this).balance / 2; // use half of the Ether
     EtherToken.deposit{value: _amount}();
   }
 
@@ -68,7 +68,7 @@ contract ProvideLiquidity is Initializable {
     (_path[0], _path[1], _path[2]) = (EtherTokenIERC20, EthBntToken, BntToken);
 
     // Define other swap parameters
-    uint256 _amount = msg.value / 2; // use half of the Ether
+    uint256 _amount = address(this).balance / 2; // use half of the Ether
     uint256 _minReturn = 1; // TODO update this
     address _affiliate = 0x0000000000000000000000000000000000000000;
     uint256 _fee = 0;
@@ -106,7 +106,7 @@ contract ProvideLiquidity is Initializable {
   /**
    * @notice Enters user into Bancor's ETH liquidity pool.
    */
-  function enterPool() external payable {
+  function enterPool() external {
     // Swap half of the Ether sent for BNT
     swapEtherForBnt();
 
@@ -135,4 +135,11 @@ contract ProvideLiquidity is Initializable {
     EtherToken.transfer(msg.sender, EtherToken.balanceOf(address(this)));
     BntToken.transfer(msg.sender, BntToken.balanceOf(address(this)));
   }
+
+  /**
+   * @notice Required so contract can receive Ether deposits
+   * @dev Solidity 0.6.0 changes fallback function implementation.
+   * See: https://solidity.readthedocs.io/en/v0.6.4/contracts.html#receive-ether-function
+   */
+  receive() external payable {}
 }

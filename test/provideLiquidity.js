@@ -1,4 +1,4 @@
-const { balance, BN, constants, ether, expectRevert } = require("@openzeppelin/test-helpers");
+const { balance, BN, constants, ether, expectRevert, send } = require("@openzeppelin/test-helpers");
 const ProvideLiquidity = artifacts.require("ProvideLiquidity");
 const IBancorConverter = artifacts.require("IBancorConverter");
 const IERC20 = artifacts.require("IERC20");
@@ -12,7 +12,6 @@ const ethBnt = '0xb1CD6e4153B2a390Cf00A6556b0fC1458C4A5533';
 // Amounts
 const toWei = web3.utils.toWei;
 const fromWei = web3.utils.fromWei;
-const initialEthAmount = ether('5'); // default Ether amount
 
 contract("Provide Liquidity", accounts => {
   // Contract instances
@@ -50,8 +49,11 @@ contract("Provide Liquidity", accounts => {
     expect(fromWei(await EthBntContract.balanceOf(provideLiquidity))).to.equal('0')
 
     // Enter liquidity pool ------------------------------------------------
-    // Send Ether and enter pool
-    await ProvideLiquidityContract.enterPool({from: alice, value: initialEthAmount, gasPrice: '1'});
+    // Send Ether to contract (sent from random address to represent Wyre)
+    await send.ether(accounts[0], provideLiquidity, ether('5'));
+
+    // Enter pool
+    await ProvideLiquidityContract.enterPool({from: alice, gasPrice: '1'});
 
     // Check that alice received EthBnt tokens
     expect(parseFloat(fromWei(await EthBntContract.balanceOf(alice)))).to.be.above(0)
