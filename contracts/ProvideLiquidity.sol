@@ -86,15 +86,19 @@ contract ProvideLiquidity is Initializable {
     // Get BNT parameters
     uint256 _reserveBalBnt = BntToken.balanceOf(address(BancorConverter));
     uint256 _amtBnt = BntToken.balanceOf(address(this));
+
     // Get EtherToken parameters
     uint256 _reserveBalEth = EtherToken.balanceOf(address(BancorConverter));
     uint256 _amtEth = EtherToken.balanceOf(address(this));
+
     // Get parameters that are the same for both EtherToken and BNT
     uint32 _ratio = 1000000; // 1,000,000 since we are doing a 50/50 split
     uint256 _supply = EthBntToken.totalSupply(); // ETHBNT pool token supply
+
     // Calculate the amount of reserve tokens received from each contribution
     uint256 _amtResBnt = BancorFormula.calculateFundCost(_supply, _reserveBalBnt, _ratio, _amtBnt);
     uint256 _amtResEth = BancorFormula.calculateFundCost(_supply, _reserveBalEth, _ratio, _amtEth);
+
     // Sum reserve token amounts to get the total
     return _amtResBnt + _amtResEth;
   }
@@ -105,21 +109,30 @@ contract ProvideLiquidity is Initializable {
   function enterPool() external payable {
     // Swap half of the Ether sent for BNT
     swapEtherForBnt();
+
     // Swap the other half of the Ether sent for EtherToken
     swapEtherForEtherToken();
+
     // Enter the pool
     BancorConverter.fund(calculatePoolTokenAmount());
+
     // Send tokens back to caller
     EthBntToken.transfer(msg.sender, EthBntToken.balanceOf(address(this)));
   }
 
   /**
    * @notice Exits the pool
+   * @param _amount Amount of pool tokens to redeem
    */
-  function exitPool() external {
-    // TODO
-    uint256 _amount = 1000000000000000000; // TODO how to get this value?
-    BancorConverter.liquidate(_amount); // TODO
-  }
+  function exitPool(uint256 _amount) external {
+    // Transfer pool tokens from user to this contract
+    EthBntToken.transferFrom(msg.sender, address(this), _amount);
 
+    // Redeem them for the underlying
+    BancorConverter.liquidate(_amount);
+
+    // Send those tokens to the caller
+    EtherToken.transfer(msg.sender, EtherToken.balanceOf(address(this)));
+    BntToken.transfer(msg.sender, BntToken.balanceOf(address(this)));
+  }
 }

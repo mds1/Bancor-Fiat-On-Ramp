@@ -48,13 +48,18 @@ contract("Provide Liquidity", accounts => {
   it('lets users enter the ETH liquidity pool', async() => {
     // Initial balance should be zero
     expect(fromWei(await EthBntContract.balanceOf(provideLiquidity))).to.equal('0')
-    // Enter liquidity pool
+
+    // Enter liquidity pool ------------------------------------------------
+    // Send Ether and enter pool
     await ProvideLiquidityContract.enterPool({from: alice, value: initialEthAmount, gasPrice: '1'});
+
     // Check that alice received EthBnt tokens
-    const ethBntTokenBal = fromWei(await EthBntContract.balanceOf(alice));
-    expect(parseFloat(ethBntTokenBal)).to.be.above(0)
+    expect(parseFloat(fromWei(await EthBntContract.balanceOf(alice)))).to.be.above(0)
+    expect(parseFloat(fromWei(await EthBntContract.balanceOf(provideLiquidity)))).to.equal(0)
+
     // Check that contract has no more EtherTokens or BNT
     // TODO why does contract still have EtherTokens and BNT?
+    console.log('Balance after Entering Pool ------------------------');
     console.log('ETHBNT Contract: ', fromWei(await EthBntContract.balanceOf(provideLiquidity)));
     console.log('ETH Contract: ', fromWei(await EtherContract.balanceOf(provideLiquidity)));
     console.log('BNT Contract: ', fromWei(await BntContract.balanceOf(provideLiquidity)));
@@ -64,11 +69,28 @@ contract("Provide Liquidity", accounts => {
     // expect(fromWei(await BntContract.balanceOf(provideLiquidity))).to.equal('0')
     // expect(fromWei(await EtherContract.balanceOf(provideLiquidity))).to.equal('0')
 
+    // Exit liquidity pool ------------------------------------------------
+    // Approve contract to spend our ETHBNT
+    await EthBntContract.approve(provideLiquidity, constants.MAX_UINT256, { from: alice });
 
+    // Get our current ETHBNT balance
+    const initialBalance = await EthBntContract.balanceOf(alice);
+
+    // Exit the pool
+    await ProvideLiquidityContract.exitPool(initialBalance, { from: alice });
+
+    // Check balances
+    console.log('Balance after Exiting Pool ------------------------');
+    console.log('ETHBNT Contract: ', fromWei(await EthBntContract.balanceOf(provideLiquidity)));
+    console.log('ETH Contract: ', fromWei(await EtherContract.balanceOf(provideLiquidity)));
+    console.log('BNT Contract: ', fromWei(await BntContract.balanceOf(provideLiquidity)));
+    console.log('ETHBNT Alice: ', fromWei(await EthBntContract.balanceOf(alice)));
+    console.log('ETH Alice: ', fromWei(await EtherContract.balanceOf(alice)));
+    console.log('BNT ALice: ', fromWei(await BntContract.balanceOf(alice)));
+
+    expect(parseFloat(fromWei(await EthBntContract.balanceOf(alice)))).to.equal(0)
+    expect(parseFloat(fromWei(await EthBntContract.balanceOf(provideLiquidity)))).to.equal(0)
+    expect(parseFloat(fromWei(await EtherContract.balanceOf(alice)))).to.be.above(0)
+    expect(parseFloat(fromWei(await BntContract.balanceOf(alice)))).to.be.above(0)
   })
-
-  // after(async () => {
-  //   // Send all Dai back to the daiExchange
-  //   await DaiContract.transfer(daiExchange, await DaiContract.balanceOf(alice), { from: alice });
-  // });
 });
