@@ -7,8 +7,9 @@ pragma solidity ^0.6.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/upgrades/contracts/Initializable.sol";
-import "./IBancorConverter.sol";
 import "./IBancorNetwork.sol";
+import "./IBancorConverter.sol";
+import "./IBancorFormula.sol";
 import "./IEtherToken.sol";
 
 contract ProvideLiquidity is Initializable {
@@ -21,6 +22,9 @@ contract ProvideLiquidity is Initializable {
   IBancorConverter public constant BancorConverter =
     IBancorConverter(0xd3ec78814966Ca1Eb4c923aF4Da86BF7e6c743bA);
 
+  IBancorFormula public constant BancorFormula =
+    IBancorFormula(0x524619EB9b4cdFFa7DA13029b33f24635478AFc0);
+
   IEtherToken public constant EtherToken = IEtherToken(0xc0829421C1d260BD3cB3E0F06cfE2D52db2cE315);
   IERC20 public constant EtherTokenIERC20 = IERC20(0xc0829421C1d260BD3cB3E0F06cfE2D52db2cE315);
   IERC20 public constant BntToken = IERC20(0x1F573D6Fb3F13d689FF844B4cE37794d79a7FF1C);
@@ -29,6 +33,9 @@ contract ProvideLiquidity is Initializable {
   event UserSet(address indexed user);
 
   constructor() public {
+    // TODO move approvals into setUser to ensure they're called upon
+    // deployment of a proxy
+
     // Approvals
     EtherToken.approve(address(BancorConverter), uint256(-1));
     BntToken.approve(address(BancorConverter), uint256(-1));
@@ -49,7 +56,7 @@ contract ProvideLiquidity is Initializable {
    */
   function swapEtherForEtherToken() internal {
     uint256 _amount = msg.value / 2; // use half of the Ether
-    EtherToken.deposit.value(_amount)();
+    EtherToken.deposit{value: _amount}();
   }
 
   /**
@@ -67,7 +74,29 @@ contract ProvideLiquidity is Initializable {
     uint256 _fee = 0;
 
     // Convert token
-    BancorNetwork.convert2.value(_amount)(_path, _amount, _minReturn, _affiliate, _fee);
+    BancorNetwork.convert2{value: _amount}(_path, _amount, _minReturn, _affiliate, _fee);
+  }
+
+  /**
+   * @notice Calculates the amount of ETHBNT tokens we should be receiving.
+   * This value is needed as an input when entering a liquidity pool
+   * @return uint256, amount of tokens
+   */
+  function calculatePoolTokenAmount() internal returns (uint256) {
+    // Get BNT parameters
+    uint256 _reserveBalBnt = BntToken.balanceOf(address(BancorConverter));
+    uint256 _amtBnt = BntToken.balanceOf(address(this));
+    // Get EtherToken parameters
+    uint256 _reserveBalEth = EtherToken.balanceOf(address(BancorConverter));
+    uint256 _amtEth = EtherToken.balanceOf(address(this));
+    // Get parameters that are the same for both EtherToken and BNT
+    uint32 _ratio = 1000000; // 1,000,000 since we are doing a 50/50 split
+    uint256 _supply = EthBntToken.totalSupply(); // ETHBNT pool token supply
+    // Calculate the amount of reserve tokens received from each contribution
+    uint256 _amtResBnt = BancorFormula.calculateFundCost(_supply, _reserveBalBnt, _ratio, _amtBnt);
+    uint256 _amtResEth = BancorFormula.calculateFundCost(_supply, _reserveBalEth, _ratio, _amtEth);
+    // Sum reserve token amounts to get the total
+    return _amtResBnt + _amtResEth;
   }
 
   /**
@@ -76,13 +105,12 @@ contract ProvideLiquidity is Initializable {
   function enterPool() external payable {
     // Swap half of the Ether sent for BNT
     swapEtherForBnt();
-
     // Swap the other half of the Ether sent for EtherToken
     swapEtherForEtherToken();
-
-    // Join the pool
-    uint256 _amount = 1000000000000000000; // TODO how to get this value?
-    BancorConverter.fund(_amount); // TODO this does not work
+    // Enter the pool
+    BancorConverter.fund(calculatePoolTokenAmount());
+    // Send tokens back to caller
+    EthBntToken.transfer(msg.sender, EthBntToken.balanceOf(address(this)));
   }
 
   /**

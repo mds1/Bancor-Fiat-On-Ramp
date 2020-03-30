@@ -17,7 +17,7 @@ const initialEthAmount = ether('5'); // default Ether amount
 contract("Provide Liquidity", accounts => {
   // Contract instances
   let ProvideLiquidityContract;
-  let EtherTokenContract;
+  let EtherContract;
   let BancorConverterContract;
   let DaiContract;
 
@@ -34,9 +34,9 @@ contract("Provide Liquidity", accounts => {
     provideLiquidity = ProvideLiquidityContract.address;
 
     // Create contract instances
-    EtherTokenContract = await IEtherToken.at(etherToken);
-    BntTokenContract = await IERC20.at(bnt);
-    EthBntTokenContract = await IERC20.at(ethBnt);
+    EtherContract = await IEtherToken.at(etherToken);
+    BntContract = await IERC20.at(bnt);
+    EthBntContract = await IERC20.at(ethBnt);
 
   });
 
@@ -46,10 +46,23 @@ contract("Provide Liquidity", accounts => {
   });
 
   it('lets users enter the ETH liquidity pool', async() => {
+    // Initial balance should be zero
+    expect(fromWei(await EthBntContract.balanceOf(provideLiquidity))).to.equal('0')
+    // Enter liquidity pool
     await ProvideLiquidityContract.enterPool({from: alice, value: initialEthAmount, gasPrice: '1'});
-
-    const ethBntTokenBal = fromWei(await EthBntTokenContract.balanceOf(provideLiquidity));
-    console.log('ethBntTokenBal ', ethBntTokenBal);
+    // Check that alice received EthBnt tokens
+    const ethBntTokenBal = fromWei(await EthBntContract.balanceOf(alice));
+    expect(parseFloat(ethBntTokenBal)).to.be.above(0)
+    // Check that contract has no more EtherTokens or BNT
+    // TODO why does contract still have EtherTokens and BNT?
+    console.log('ETHBNT Contract: ', fromWei(await EthBntContract.balanceOf(provideLiquidity)));
+    console.log('ETH Contract: ', fromWei(await EtherContract.balanceOf(provideLiquidity)));
+    console.log('BNT Contract: ', fromWei(await BntContract.balanceOf(provideLiquidity)));
+    console.log('ETHBNT Alice: ', fromWei(await EthBntContract.balanceOf(alice)));
+    console.log('ETH Alice: ', fromWei(await EtherContract.balanceOf(alice)));
+    console.log('BNT ALice: ', fromWei(await BntContract.balanceOf(alice)));
+    // expect(fromWei(await BntContract.balanceOf(provideLiquidity))).to.equal('0')
+    // expect(fromWei(await EtherContract.balanceOf(provideLiquidity))).to.equal('0')
 
 
   })
