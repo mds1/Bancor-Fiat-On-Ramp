@@ -42,6 +42,16 @@ contract ProvideLiquidity is Initializable {
   event Initialized(address indexed user);
 
   /**
+   * @notice Emitted when user enters the pool
+   */
+  event PoolEntered(uint256 indexed amount);
+
+  /**
+   * @notice Emitted when the user leaves the pool
+   */
+  event PoolExited(uint256 indexed amount);
+
+  /**
    * @dev Emitted when a token is withdrawn without being converted to Chai
    */
   event TokensWithdrawn(uint256 indexed amount, address token);
@@ -137,7 +147,9 @@ contract ProvideLiquidity is Initializable {
     swapEtherForEtherToken();
 
     // Enter the pool
-    BancorConverter.fund(calculatePoolTokenAmount());
+    uint256 _amount = calculatePoolTokenAmount();
+    emit PoolEntered(_amount);
+    BancorConverter.fund(_amount);
 
     // Send tokens back to caller
     EthBntToken.transfer(msg.sender, EthBntToken.balanceOf(address(this)));
@@ -152,6 +164,7 @@ contract ProvideLiquidity is Initializable {
     EthBntToken.transferFrom(msg.sender, address(this), _amount);
 
     // Redeem them for the underlying
+    emit PoolExited(_amount);
     BancorConverter.liquidate(_amount);
 
     // Send those tokens to the caller
