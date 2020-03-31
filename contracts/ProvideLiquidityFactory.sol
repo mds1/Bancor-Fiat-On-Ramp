@@ -38,8 +38,8 @@ contract ProvideLiquidityFactory is Ownable, GSNRecipient {
     // Contract user is the user who sent the meta-transaction
     address _user = _msgSender();
 
-    // Define function call to set user as the owner of the new ProvideLiquidity contract
-    bytes memory _payload = abi.encodeWithSignature("setUser(address)", _user);
+    // Define function call to initialize the new ProvideLiquidity contract
+    bytes memory _payload = abi.encodeWithSignature("initialize(address)", _user);
 
     // Deploy proxy
     address _contract = deployMinimal(_target, _payload);

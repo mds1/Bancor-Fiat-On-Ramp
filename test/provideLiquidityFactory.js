@@ -26,13 +26,13 @@ contract("Provide Liquidity", accounts => {
   let provideLiquidity;
 
   beforeEach(async () => {
-    // Deploy and initialize factory
+    // Deploy factory
     FactoryInstance = await Factory.new({ from: bancor });
     factory = FactoryInstance.address;
 
-    // Deploy ProvideLiquidity instance logic template
+    // Deploy and initialize ProvideLiquidity instance logic template
     ProvideLiquidityContract = await ProvideLiquidity.new({ from: bancor });
-    await ProvideLiquidityContract.setUser(bancor, { from: bancor }); // set bancor as user for template
+    await ProvideLiquidityContract.initialize(bancor, { from: bancor }); // set bancor as user for template
     provideLiquidity = ProvideLiquidityContract.address;
   });
 
@@ -47,9 +47,11 @@ contract("Provide Liquidity", accounts => {
   it("properly deploys and configures proxy contracts", async () => {
     // This test calls the deployment directly instead of via the GSN
     const { logs } = await FactoryInstance.createContract(provideLiquidity, { from: alice });
+
     // Get instance of the newly deployed proxy
     const proxy = await FactoryInstance.getContract(alice);
-    const ProxyInstance = await ProvideLiquidity.at(proxy)
+    const ProxyInstance = await ProvideLiquidity.at(proxy);
+
     // Ensure proxy was deployed properly and check parameters
     expect(await FactoryInstance.isClone(provideLiquidity, proxy)).to.be.true;
     expect(await ProxyInstance.user()).to.equal(alice)
