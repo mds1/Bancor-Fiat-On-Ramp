@@ -19,16 +19,25 @@ import "./ProvideLiquidity.sol";
  */
 contract ProvideLiquidityFactory is Ownable, GSNRecipient {
 
+  // Supported tokens
+  IEtherToken public constant EtherToken = IEtherToken(0xc0829421C1d260BD3cB3E0F06cfE2D52db2cE315);
+  IERC20 public constant BntToken = IERC20(0x1F573D6Fb3F13d689FF844B4cE37794d79a7FF1C);
+  IERC20 public constant EthBntToken = IERC20(0xb1CD6e4153B2a390Cf00A6556b0fC1458C4A5533);
+
   // Store list of all users (for convenience)
   address[] public users;
 
   // Maps user => their contract
   mapping (address => address) public getContract;
 
-  // Emitted when a new proxy is created
+  /**
+   * @notice Emitted when a new proxy is created
+   */
   event ProxyCreated(address indexed proxy, address indexed user);
 
-  constructor() public {}
+  // ===============================================================================================
+  //                                 Main Factory Functionality
+  // ===============================================================================================
 
   /**
    * @notice Called to deploy a clone of _target for _user
@@ -103,6 +112,45 @@ contract ProvideLiquidityFactory is Ownable, GSNRecipient {
     return users;
   }
 
+  // ===============================================================================================
+  //                                     Proxy Interaction
+  // ===============================================================================================
+
+  /**
+   * @dev The GSN requires you to fund your contract so gas costs and relayers
+   * can be paid. Since we use a factory pattern, it would be inconvenient to
+   * have to fund each deployed proxy in order for users to use their proxy.
+   * Instead, we fund this factory contract, and enable users to interact with
+   * this proxy via the factory contract. So if a user has ETH for gas, they
+   * can call their proxy contract directly. If they do not have ETH for gas,
+   * they can interact with their proxy through this factory contract to have
+   * gas funds paid for them.
+   */
+
+  /**
+   * @notice Enters user into Bancor's ETH liquidity pool.
+   */
+  function enterPool() external {
+    // Get address of caller's proxy contract
+    address _proxy = getContract[_msgSender()];
+
+    // Enter pool
+    ProvideLiquidity Proxy = ProvideLiquidity(payable(_proxy));
+    Proxy.enterPool();
+  }
+
+  /**
+   * @notice Exits the pool
+   * @param _amount Amount of pool tokens to redeem
+   */
+  function exitPool(uint256 _amount) external {
+    // Get address of caller's proxy contract
+    address _proxy = getContract[_msgSender()];
+
+    // Enter pool
+    ProvideLiquidity Proxy = ProvideLiquidity(payable(_proxy));
+    Proxy.exitPool(_amount);
+  }
 
   // ===============================================================================================
   //                               Gas Station Network Functions

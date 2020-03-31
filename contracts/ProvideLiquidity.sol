@@ -18,6 +18,11 @@ contract ProvideLiquidity is Initializable {
   // are only for the user
   address public user;
 
+  // Factory is the address of the parent factory contract. This is used
+  // to restrict function calls to being either directly from the user
+  // or from the factory contract
+  address public factory;
+
   // Contracts needed to interact with Bancor
   IBancorNetwork public constant BancorNetwork =
     IBancorNetwork(0x3Ab6564d5c214bc416EE8421E05219960504eeAD);
@@ -66,7 +71,7 @@ contract ProvideLiquidity is Initializable {
   // ===============================================================================================
 
   modifier onlyUser() {
-    require(user == msg.sender, "ProvideLiquidity: Caller is not authorized");
+    require(msg.sender == user || msg.sender == factory, "ProvideLiquidity: Caller is not authorized");
     _;
   }
 
@@ -78,6 +83,7 @@ contract ProvideLiquidity is Initializable {
   function initialize(address _user) external initializer {
     emit Initialized(_user);
     user = _user;
+    factory = msg.sender;
 
     // Approvals
     EtherToken.approve(address(BancorConverter), uint256(-1));
@@ -150,9 +156,6 @@ contract ProvideLiquidity is Initializable {
     uint256 _amount = calculatePoolTokenAmount();
     emit PoolEntered(_amount);
     BancorConverter.fund(_amount);
-
-    // Send tokens back to caller
-    EthBntToken.transfer(msg.sender, EthBntToken.balanceOf(address(this)));
   }
 
   /**
@@ -160,16 +163,9 @@ contract ProvideLiquidity is Initializable {
    * @param _amount Amount of pool tokens to redeem
    */
   function exitPool(uint256 _amount) external onlyUser {
-    // Transfer pool tokens from user to this contract
-    EthBntToken.transferFrom(msg.sender, address(this), _amount);
-
     // Redeem them for the underlying
     emit PoolExited(_amount);
     BancorConverter.liquidate(_amount);
-
-    // Send those tokens to the caller
-    EtherToken.transfer(msg.sender, EtherToken.balanceOf(address(this)));
-    BntToken.transfer(msg.sender, BntToken.balanceOf(address(this)));
   }
 
   /**
@@ -192,7 +188,6 @@ contract ProvideLiquidity is Initializable {
     IERC20 _token = IERC20(_tokenAddress);
     uint256 _balance = _token.balanceOf(address(this));
     emit TokensWithdrawn(_balance, _tokenAddress);
-
     _token.transfer(user, _balance);
   }
 
@@ -203,13 +198,6 @@ contract ProvideLiquidity is Initializable {
   function withdrawEther() external onlyUser {
     uint256 _balance = address(this).balance;
     emit EtherWithdrawn(_balance);
-
-    // Note: Even though this transfers control to the recipient, we do not have to worry
-    // about reentrancy here. This is because:
-    //   1. This function can only be called by the user
-    //   2. All Ether sent to this contract should belong to the user anyway, so
-    //      there is no way for reentrancy to enable the owner/attacker to send
-    //       more Ether to themselves.
     payable(user).transfer(_balance);
   }
 }
