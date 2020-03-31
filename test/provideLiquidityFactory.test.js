@@ -45,7 +45,7 @@ contract("Provide Liquidity", accounts => {
 
     // Deploy and initialize ProvideLiquidity instance logic template
     ProvideLiquidityContract = await ProvideLiquidity.new({ from: bancor });
-    await ProvideLiquidityContract.initialize(bancor, { from: bancor }); // set bancor as user for template
+    await ProvideLiquidityContract.initializeContract(bancor, { from: bancor }); // set bancor as user for template
     provideLiquidity = ProvideLiquidityContract.address;
   });
 

@@ -80,7 +80,7 @@ contract ProvideLiquidity is Initializable {
    * executes token approvals
    * @dev initializer modifier ensures this can only be called once
    */
-  function initialize(address _user) external initializer {
+  function initializeContract(address _user) external initializer {
     emit Initialized(_user);
     user = _user;
     factory = msg.sender;

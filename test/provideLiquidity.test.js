@@ -38,7 +38,7 @@ contract("Provide Liquidity", accounts => {
     // Note: Deploying from bancor implies bancor is the factory and can send
     // transactions on behalf of user
     ProvideLiquidityContract = await ProvideLiquidity.new({ from: bancor });
-    ProvideLiquidityContract.initialize(alice, { from: bancor });
+    ProvideLiquidityContract.initializeContract(alice, { from: bancor });
     provideLiquidity = ProvideLiquidityContract.address;
 
     // Create contract instances
@@ -67,7 +67,7 @@ contract("Provide Liquidity", accounts => {
 
   it("only lets contract be initialized once", async () => {
     await expectRevert(
-      ProvideLiquidityContract.initialize(bancor, { from: bancor }),
+      ProvideLiquidityContract.initializeContract(bancor, { from: bancor }),
       "Contract instance has already been initialized"
     );
   });

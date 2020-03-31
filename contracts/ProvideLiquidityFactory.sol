@@ -48,7 +48,7 @@ contract ProvideLiquidityFactory is Ownable, GSNRecipient {
     address _user = _msgSender();
 
     // Define function call to initialize the new ProvideLiquidity contract
-    bytes memory _payload = abi.encodeWithSignature("initialize(address)", _user);
+    bytes memory _payload = abi.encodeWithSignature("initializeContract(address)", _user);
 
     // Deploy proxy
     address _contract = deployMinimal(_target, _payload);

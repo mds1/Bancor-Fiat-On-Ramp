@@ -5,7 +5,7 @@ const HDWalletProvider = require("truffle-hdwallet-provider");
 const INFURA_ID = process.env.INFURA_ID || 'd6760e62b67f4937ba1ea2691046f06d';
 
 
-const configNetwork = (network, networkId, path = "m/44'/60'/0'/0/", gas = 4465030, gasPrice = 1e10) => ({
+const configNetwork = (network, networkId, path = "m/44'/60'/0'/0/", gas = 4465030, gasPrice = 0.3e10) => ({
   provider: () => new HDWalletProvider(
     mnemonic, `https://${network}.infura.io/v3/${INFURA_ID}`,
         0, 1, true, path
@@ -27,7 +27,7 @@ module.exports = {
     ropsten: configNetwork('ropsten', 3),
     kovan: configNetwork('kovan', 42),
     rinkeby: configNetwork('rinkeby', 4),
-    main: configNetwork('mainnet', 1),
+    main: configNetwork('mainnet', 1, "m/44'/60'/0'/0/1'"),
   },
   compilers: {
     solc: {
