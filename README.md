@@ -114,13 +114,14 @@ yarn run test
 2. Make sure your `MNEMONIC` is set in `.env` and if necessary configure the derivation path used in `truffle-config.js`.
 3. Run `source .env`
 4. Run `npx oz accounts` to confirm the right address would be used for deployment
-5. Run `npx oz create` and follow the prompts to deploy `ProvideLiquidity.sol`. Call the `initializeContract(address _user)` function and pass in the deployer's address as the `_user`. Since this is just a logic template, it doesn't matter much who the user is
-6. View the contract on Etherscan and confirm that it was successfully initialized by checking the value of the `user` variable. You can do this in the Read as Proxy tab. If it was not initialized, make sure to do so manually.
-7. Run `npx oz create` and follow the prompts to deploy `ProvideLiquidityFactory.sol`. Call the `initializeContract()` function and confirm it was called properly. Note that this function does not require any inputs.
+5. Run `npx oz deploy` and follow the prompts to deploy `ProvideLiquidity.sol`
+6. Run `npx oz send-tx` to call the `initializeContract(address _user)` function and pass in the deployer's address as the `_user`. Since this is just a logic template, it doesn't matter much who the user is
+7. View the contract on Etherscan and confirm that it was successfully initialized by checking the value of the `user` variable. You can do this in the Read as Proxy tab. If it was not initialized, make sure to do so manually.
+8. Run `npx oz deploy` and follow the prompts to deploy `ProvideLiquidityFactory.sol`.
 
 Done! There will now be a file called `.openzeppelin/<network>.json` which contains deployment info for the contracts. Be sure not to delete that file.
 
-Be aware that these deployed contracts will be upgradable by default. The easiest way to remove upgradeability is to change the upgradeability admin to the zero address. Alternatively, you can use newer versions of the OpenZeppelin CLI which support deploying regular contracts.
+For `ProvideLiquidity.sol`, the `initializeContract()` function is used in place of the constructor in order to call it when deployed as a proxy. Because the proxies simply delegatecall to the logic address, as opposed to a traditional deployment, the constructor would not be called.
 
 More information on deploying and upgrading contracts with the OpenZeppelin CLI can be found at:
 

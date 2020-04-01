@@ -1,0 +1,27 @@
+{
+  "manifestVersion": "2.2",
+  "contracts": {
+    "ProvideLiquidity": "ProvideLiquidity"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts-ethereum-package": "^2.5.0"
+  },
+  "name": "bancor-fiat-on-ramp",
+  "version": "0.1.0",
+  "compiler": {
+    "compilerSettings": {
+      "optimizer": {
+        "enabled": false,
+        "runs": "200"
+      }
+    },
+    "typechain": {
+      "enabled": false
+    },
+    "manager": "openzeppelin",
+    "artifactsDir": "build/contracts",
+    "contractsDir": "contracts",
+    "solcVersion": "0.6.4"
+  },
+  "telemetryOptIn": true
+}
