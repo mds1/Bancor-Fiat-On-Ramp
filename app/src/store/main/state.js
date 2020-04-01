@@ -6,5 +6,9 @@ export default function () {
       blockNumber: undefined,
       networkId: undefined,
     },
+    contracts: {
+      Logic: undefined,
+      Factory: undefined,
+    },
   };
 }

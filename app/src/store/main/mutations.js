@@ -10,3 +10,11 @@ export function setWallet(state, wallet) {
     state.userAddress = wallet.userAddress;
   }
 }
+
+export function setContracts(state, contracts) {
+  try {
+    Object.assign(state.contracts, contracts);
+  } catch {
+    state.contracts = contracts;
+  }
+}

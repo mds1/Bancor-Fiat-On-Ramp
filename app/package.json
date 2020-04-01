@@ -13,6 +13,7 @@
     "test": "echo \"No test specified\" && exit 0"
   },
   "dependencies": {
+    "@openzeppelin/gsn-provider": "^0.1.10",
     "@quasar/extras": "^1.0.0",
     "bnc-onboard": "^1.4.0",
     "ethers": "^4.0.46",

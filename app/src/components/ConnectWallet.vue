@@ -100,7 +100,7 @@ export default {
         await onboard.walletCheck();
         // Update state with signer info
         const signer = provider.getSigner();
-        await this.$store.dispatch('main/setWallet', signer);
+        await this.$store.dispatch('main/setEthereumData', signer);
         // Now we have a contract instance to use for sending transactions from
         // the selected wallet
         // this.ESRedemption = new ethers.Contract(addresses.ESRedemption, abi, signer);
