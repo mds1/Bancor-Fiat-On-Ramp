@@ -1,36 +1,41 @@
 <template>
   <div>
     <!-- Connect Wallet -->
-    <div class="q-mb-xl">
-      <h4 class="q-mb-md">
-        Have a Wallet?
-      </h4>
-      <q-btn
-        label="Connect Wallet to Get Started"
-        color="primary"
-        :loading="isMainLoading"
-        @click="connectWallet()"
-      />
-    </div>
-    <!-- Create new wallet -->
-    <div>
-      <h4 class="q-mb-md">
-        Need a Wallet?
-      </h4>
-      <p>Use Torus to connect with Google, Facebook, Reddit, Discord, or Twitch</p>
-      <q-btn
-        label="Connect Account"
-        color="primary"
-        :loading="isBackupLoading"
-        @click="connectWallet(true)"
-      />
+    <div class="row justify-center">
+      <q-card class="col-auto card q-ma-md">
+        <h4 class="q-mb-md">
+          Have a Wallet?
+        </h4>
+        <p>Login with the wallet provider of your choice</p>
+        <br>
+        <q-btn
+          label="Connect Wallet"
+          class="q-my-md"
+          color="primary"
+          :loading="isMainLoading"
+          @click="connectWallet()"
+        />
+      </q-card>
+      <!-- Create new wallet -->
+      <q-card class="col-auto card q-ma-md">
+        <h4 class="q-mb-md">
+          Need a Wallet?
+        </h4>
+        <p>Use Torus to connect with Google, Facebook, Reddit, Discord, or Twitch</p>
+        <q-btn
+          label="Create Wallet"
+          class="q-my-md"
+          color="primary"
+          :loading="isBackupLoading"
+          @click="connectWallet(true)"
+        />
+      </q-card>
     </div>
   </div>
 </template>
 
 <script>
 import { mapState } from 'vuex';
-import { ethers } from 'ethers';
 import Onboard from 'bnc-onboard';
 
 let provider;
@@ -80,7 +85,7 @@ export default {
             networkId: 1, // [Integer] The Ethereum network ID your Dapp uses.
             darkMode: Boolean(this.$q.localStorage.getItem('isDark')),
             subscriptions: {
-              wallet: (wallet) => { provider = new ethers.providers.Web3Provider(wallet.provider); },
+              wallet: (wallet) => { provider = wallet.provider; },
             },
           });
         } else {
@@ -92,15 +97,14 @@ export default {
             networkId: 1, // [Integer] The Ethereum network ID your Dapp uses.
             darkMode: Boolean(this.$q.localStorage.getItem('isDark')),
             subscriptions: {
-              wallet: (wallet) => { provider = new ethers.providers.Web3Provider(wallet.provider); },
+              wallet: (wallet) => { provider = wallet.provider; },
             },
           });
         }
         await onboard.walletSelect();
         await onboard.walletCheck();
-        // Update state with signer info
-        const signer = provider.getSigner();
-        await this.$store.dispatch('main/setEthereumData', signer);
+        // Update state with wallet info
+        await this.$store.dispatch('main/setEthereumData', provider);
         // Now we have a contract instance to use for sending transactions from
         // the selected wallet
         // this.ESRedemption = new ethers.Contract(addresses.ESRedemption, abi, signer);
@@ -114,3 +118,10 @@ export default {
   },
 };
 </script>
+
+<style lang="stylus" scoped>
+.card {
+  max-width 350px
+  padding 1.5rem
+}
+</style>

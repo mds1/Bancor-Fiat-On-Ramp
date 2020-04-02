@@ -3350,6 +3350,17 @@ bn.js@^5.1.1:
   resolved "https://registry.yarnpkg.com/bn.js/-/bn.js-5.1.1.tgz#48efc4031a9c4041b9c99c6941d903463ab62eb5"
   integrity sha512-IUTD/REb78Z2eodka1QZyyEk66pciRcP6Sroka0aI3tG/iwIdYLrBD62RsubR7vqdt3WyX8p4jxeatzmRSphtA==
 
+bnc-notify@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/bnc-notify/-/bnc-notify-1.1.1.tgz#37766b66d59d1bf6830c31ded97539a5af9a773b"
+  integrity sha512-ES+YzySw0O63vHON/JTVhUwbDEM4lG3cE77xDAgnp6mdHcWsPZZ/SbZ/+04kbY4/pS3GAwT/CAeTbhWYBBn2KQ==
+  dependencies:
+    bignumber.js "^9.0.0"
+    bnc-sdk "2.0.0"
+    lodash.debounce "^4.0.8"
+    regenerator-runtime "^0.13.3"
+    uuid "^3.3.3"
+
 bnc-onboard@^1.4.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/bnc-onboard/-/bnc-onboard-1.4.0.tgz#2645b3cc940addfd856c2952d63512e1ed23fc40"
@@ -3379,6 +3390,14 @@ bnc-sdk@1.1.0:
   resolved "https://registry.yarnpkg.com/bnc-sdk/-/bnc-sdk-1.1.0.tgz#00a2a4387c2a507228d70cd622aaaf1423149a0a"
   integrity sha512-H7T3982JS+h7EeokDivMuRyDmeo9riTc3kZBXCYFElflNMVm1M1sO91i+6YvCxVWi365Qv2FJcvhCwvOnyXTQQ==
   dependencies:
+    sturdy-websocket "^0.1.12"
+
+bnc-sdk@2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/bnc-sdk/-/bnc-sdk-2.0.0.tgz#90b5926a758b9c9050bcbd2854cf3502a5899aff"
+  integrity sha512-IPOtIR0qZ4MtnGlMXVsjxbShANbaIfxksVZOXh/4hjpcSRKI3Gc3N+hq+P0CqeN0nhTuDARkCavDrlq/oPKyUQ==
+  dependencies:
+    crypto-es "^1.2.2"
     sturdy-websocket "^0.1.12"
 
 body-parser@1.19.0, body-parser@^1.16.0:
@@ -4462,6 +4481,11 @@ crypto-browserify@3.12.0, crypto-browserify@^3.11.0:
     public-encrypt "^4.0.0"
     randombytes "^2.0.0"
     randomfill "^1.0.3"
+
+crypto-es@^1.2.2:
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/crypto-es/-/crypto-es-1.2.2.tgz#ed36b08af530808dff2214ffe696a2ae62497640"
+  integrity sha512-opab8M4wcsMWMDAMl+2G7inqlVyvAGNsJT8eOQRBOKNqsSFPQ8/WLP9tp0Q7bVxeNp/1e9TWn/x5GmcUVhRDUg==
 
 crypto-js@^3.1.4:
   version "3.3.0"
@@ -8630,7 +8654,7 @@ lodash.clonedeep@^4.5.0:
   resolved "https://registry.yarnpkg.com/lodash.clonedeep/-/lodash.clonedeep-4.5.0.tgz#e23f3f9c4f8fbdde872529c1071857a086e5ccef"
   integrity sha1-4j8/nE+Pvd6HJSnBBxhXoIblzO8=
 
-lodash.debounce@4.0.8:
+lodash.debounce@4.0.8, lodash.debounce@^4.0.8:
   version "4.0.8"
   resolved "https://registry.yarnpkg.com/lodash.debounce/-/lodash.debounce-4.0.8.tgz#82d79bff30a67c4005ffd5e2515300ad9ca4d7af"
   integrity sha1-gteb/zCmfEAF/9XiUVMArZyk168=
@@ -13379,7 +13403,7 @@ uuid@7.0.2:
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-7.0.2.tgz#7ff5c203467e91f5e0d85cfcbaaf7d2ebbca9be6"
   integrity sha512-vy9V/+pKG+5ZTYKf+VcphF5Oc6EFiu3W8Nv3P3zIh0EqVI80ZxOzuPfe9EHjkFNvf8+xuTHVeei4Drydlx4zjw==
 
-uuid@^3.0.1, uuid@^3.3.2:
+uuid@^3.0.1, uuid@^3.3.2, uuid@^3.3.3:
   version "3.4.0"
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.4.0.tgz#b23e4358afa8a202fe7a100af1f5f883f02007ee"
   integrity sha512-HjSDRw6gZE5JMggctHBcjVak08+KEVhSIiDzFnT9S9aegmp85S/bReBVTb4QTFaRNptJ9kuYaNhnbNEOkbKb/A==
@@ -13813,7 +13837,7 @@ web3@^0.20.7:
     xhr2-cookies "^1.1.0"
     xmlhttprequest "*"
 
-web3@^1.2.1:
+web3@^1.2.1, web3@^1.2.6:
   version "1.2.6"
   resolved "https://registry.yarnpkg.com/web3/-/web3-1.2.6.tgz#c497dcb14cdd8d6d9fb6b445b3b68ff83f8ccf68"
   integrity sha512-tpu9fLIComgxGrFsD8LUtA4s4aCZk7px8UfcdEy6kS2uDi/ZfR07KJqpXZMij7Jvlq+cQrTAhsPSiBVvoMaivA==

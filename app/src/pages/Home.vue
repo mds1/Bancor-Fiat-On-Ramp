@@ -18,10 +18,30 @@
         <connect-wallet />
       </div>
       <div
-        v-else
-        class="row justify-center "
+        v-else-if="isLoading"
+        class="row justify-center"
       >
-        <deposit-with-wyre />
+        <q-spinner
+          :color="color"
+          size="4em"
+        />
+        <div class="col-xs-12 text-center q-mt-md">
+          Loading...
+        </div>
+      </div>
+      <div v-else>
+        <div
+          v-if="!proxyAddress || proxyAddress == '0x0000000000000000000000000000000000000000'"
+          class="row justify-center "
+        >
+          <deploy-proxy />
+        </div>
+        <div
+          v-else
+          class="row justify-center "
+        >
+          <deposit-with-wyre />
+        </div>
       </div>
     </div>
   </q-page>
@@ -30,20 +50,31 @@
 <script>
 import { mapState } from 'vuex';
 import ConnectWallet from 'components/ConnectWallet';
+import DeployProxy from 'components/DeployProxy';
 import DepositWithWyre from 'components/DepositWithWyre';
 
 export default {
-  name: 'PageIndex',
+  name: 'Home',
 
   components: {
     ConnectWallet,
+    DeployProxy,
     DepositWithWyre,
   },
 
   computed: {
     ...mapState({
       userAddress: (state) => state.main.userAddress,
+      proxyAddress: (state) => state.main.proxy.address,
     }),
+
+    isLoading() {
+      return this.proxyAddress === undefined;
+    },
+
+    color() {
+      return this.$q.dark.isActive ? 'accent' : 'primary';
+    },
   },
 };
 </script>

@@ -48,6 +48,7 @@ module.exports = function (ctx) {
       // Quasar plugins
       plugins: [
         'LocalStorage',
+        'Notify',
       ],
     },
 
@@ -83,10 +84,20 @@ module.exports = function (ctx) {
         ? { // so on dev we'll have these environment variables
           INFURA_ID: JSON.stringify(process.env.INFURA_ID),
           BLOCKNATIVE_API_KEY: JSON.stringify(process.env.BLOCKNATIVE_API_KEY),
+          FORTMATIC_API_KEY: JSON.stringify(process.env.FORTMATIC_API_KEY),
+          PORTIS_API_KEY: JSON.stringify(process.env.PORTIS_API_KEY),
+          SQUARELINK_API_KEY: JSON.stringify(process.env.SQUARELINK_API_KEY),
+          WYRE_ACCOUNT_ID: JSON.stringify(process.env.WYRE_ACCOUNT_ID),
+          WYRE_ENV: JSON.stringify(process.env.WYRE_ENV),
         }
         : { // and on build (production) we'll have these:
           INFURA_ID: JSON.stringify(process.env.INFURA_ID),
           BLOCKNATIVE_API_KEY: JSON.stringify(process.env.BLOCKNATIVE_API_KEY),
+          FORTMATIC_API_KEY: JSON.stringify(process.env.BLOCKNATIVE_API_KEY),
+          PORTIS_API_KEY: JSON.stringify(process.env.PORTIS_API_KEY),
+          SQUARELINK_API_KEY: JSON.stringify(process.env.SQUARELINK_API_KEY),
+          WYRE_ACCOUNT_ID: JSON.stringify(process.env.WYRE_ACCOUNT_ID),
+          WYRE_ENV: JSON.stringify(process.env.WYRE_ENV),
         },
     },
 
