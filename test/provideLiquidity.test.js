@@ -85,14 +85,14 @@ contract("Provide Liquidity", accounts => {
 
   it("only lets the user withdraw stray tokens", async () => {
     await expectRevert(
-      ProvideLiquidityContract.withdrawTokens(bnt, { from: attacker }),
+      ProvideLiquidityContract.withdrawTokens(bnt, attacker, { from: attacker }),
       "ProvideLiquidity: Caller is not authorized"
     );
   });
 
   it("only lets the user withdraw stray Ether", async () => {
     await expectRevert(
-      ProvideLiquidityContract.withdrawEther({ from: attacker }),
+      ProvideLiquidityContract.withdrawEther(attacker, { from: attacker }),
       "ProvideLiquidity: Caller is not authorized"
     );
   });
@@ -156,7 +156,7 @@ contract("Provide Liquidity", accounts => {
       .to.be.equal(daiAmount.toString());
 
     // Withdraw the Dai to Alice's wallet and check result
-    await ProvideLiquidityContract.withdrawTokens(dai, { from: alice });
+    await ProvideLiquidityContract.withdrawTokens(dai, alice, { from: alice });
     expect((await DaiContract.balanceOf(alice)).toString()).to.equal( daiAmount.toString());
   });
 
@@ -167,7 +167,7 @@ contract("Provide Liquidity", accounts => {
 
     // Withdraw the Ether and check result
     const initialBalance = (await balance.current(alice)).toString(); // get initial ETH balance
-    await ProvideLiquidityContract.withdrawEther({ from: alice });
+    await ProvideLiquidityContract.withdrawEther(alice, { from: alice });
     const newBalance = (await balance.current(alice)).toString(); // get updated ETH balance
     expect(parseFloat(newBalance)).to.be.above(parseFloat(initialBalance));
   });
