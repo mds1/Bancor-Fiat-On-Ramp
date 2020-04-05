@@ -40,7 +40,10 @@
           v-else
           class="row justify-center "
         >
+          <!-- TWO CARDS FOR DEPOSITING -->
           <deposit-with-wyre />
+          <!-- ONE CARD FOR WITHDRAWING -->
+          <exit-pool />
         </div>
       </div>
     </div>
@@ -54,6 +57,7 @@ import { mapState } from 'vuex';
 import ConnectWallet from 'components/ConnectWallet';
 import DeployProxy from 'components/DeployProxy';
 import DepositWithWyre from 'components/DepositWithWyre';
+import ExitPool from 'components/ExitPool';
 import UserAccountInfo from 'components/UserAccountInfo';
 
 export default {
@@ -63,6 +67,7 @@ export default {
     ConnectWallet,
     DeployProxy,
     DepositWithWyre,
+    ExitPool,
     UserAccountInfo,
   },
 

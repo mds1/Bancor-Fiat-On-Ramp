@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="row justify-center">
-      <q-card class="text-center col-auto card q-ma-md">
+      <q-card class="text-center col-auto card">
         <q-card-section>
           <h4 class="q-mb-md">
             Account Balances
@@ -45,13 +45,6 @@
             </div>
           </div>
         </q-card-section>
-
-        <q-card-section>
-          <div class="text-caption text-italic q-mb-md">
-            Use the button below to exit the pool and redeem your ETHBNT pool tokens
-          </div>
-          <exit-pool />
-        </q-card-section>
       </q-card>
     </div>
   </div>
@@ -59,14 +52,9 @@
 
 <script>
 import { mapState } from 'vuex';
-import ExitPool from 'components/ExitPool';
 
 export default {
   name: 'UserAccountInfo',
-
-  components: {
-    ExitPool,
-  },
 
   data() {
     return {};

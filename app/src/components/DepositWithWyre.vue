@@ -5,7 +5,10 @@
       style="max-width: 900px"
     >
       <!-- DEPOSIT -->
-      <q-card class="col text-center q-px-lg q-py-md q-ma-md">
+      <q-card
+        class="col text-center q-px-lg q-py-md q-ma-md"
+        style="max-width: 400px"
+      >
         <q-card-section>
           <h6>Step 1</h6>
           <h4 class="text-bold">
@@ -37,7 +40,10 @@
       </q-card>
 
       <!-- ENTER POOL -->
-      <q-card class="col text-center q-px-lg q-py-md q-ma-md">
+      <q-card
+        class="col text-center q-px-lg q-py-md q-ma-md"
+        style="max-width: 400px"
+      >
         <q-card-section>
           <h6>Step 2</h6>
           <h4 class="text-bold">

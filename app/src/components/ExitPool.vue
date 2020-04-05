@@ -39,14 +39,57 @@
       </q-card>
     </q-dialog>
 
-    <!-- EXIT BUTTON -->
-    <q-btn
-      color="primary"
-      label="Exit Pool"
-      :loading="isLoading"
-      :disabled="ethBntBalance === 0"
-      @click="exitPool"
-    />
+    <!-- EXIT FORM -->
+    <q-card
+      class="col text-center q-px-lg q-py-md q-ma-md"
+      style="max-width: 450px"
+    >
+      <q-card-section>
+        <h6>Step 3 (After some time...)</h6>
+        <h4 class="text-bold">
+          Exit the Pool
+        </h4>
+      </q-card-section>
+
+      <q-card-section>
+        <div class="text-caption text-justify">
+          Redeem all pool tokens as ETH to the specified the address. If you'd like to keep them
+          in your proxy contract (i.e. if you want to enter into a different pool),
+          use the "Keep in Proxy" button.
+        </div>
+      </q-card-section>
+
+      <q-card-section>
+        <q-input
+          v-model="recipientAddress"
+          class="q-mb-md"
+          filled
+          label="Address to withdraw to"
+        >
+          <template v-slot:append>
+            <q-btn
+              :color="$q.dark.isActive ? 'white' : 'primary'"
+              flat
+              label="Keep in proxy"
+              @click="setRecipientAddressToProxy"
+            />
+          </template>
+        </q-input>
+        <q-btn
+          color="primary"
+          label="Exit Pool"
+          :loading="isLoading"
+          :disabled="ethBntBalance === 0"
+          @click="exitPool"
+        />
+        <div
+          v-if="ethBntBalance === 0"
+          class="text-caption text-italic text-center q-mt-md"
+        >
+          You have no pool tokens to withdraw
+        </div>
+      </q-card-section>
+    </q-card>
   </div>
 </template>
 
@@ -69,6 +112,7 @@ export default {
     return {
       isLoading: false,
       isExitComplete: false,
+      recipientAddress: undefined,
     };
   },
 
@@ -85,6 +129,10 @@ export default {
   },
 
   methods: {
+    setRecipientAddressToProxy() {
+      this.recipientAddress = this.proxyAddress;
+    },
+
     async exitPool() {
       /* eslint-disable no-console */
       this.isLoading = true;
@@ -104,7 +152,7 @@ export default {
 
       try {
         console.log('Requesting signature and sending transaction...');
-        this.FactoryContract.methods.exitPool(ethBntBalance)
+        this.FactoryContract.methods.exitAndWithdraw(ethBntBalance, this.recipientAddress)
           .send({ from: this.userAddress, gas: '1000000', gasPrice: this.gasPrice })
           .on('transactionHash', async (txHash) => {
             console.log('txHash: ', txHash);

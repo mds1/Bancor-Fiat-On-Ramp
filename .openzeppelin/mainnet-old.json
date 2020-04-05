@@ -1,0 +1,21 @@
+{
+  "contracts": {},
+  "solidityLibs": {},
+  "proxies": {
+    "bancor-fiat-on-ramp/ProvideLiquidity": [
+      {
+        "address": "0x9cbD6867E1245Ca6fAd3A702764193de29D9Ec95",
+        "kind": "NonProxy",
+        "bytecodeHash": "6e7f1a87edd9e4b1bcabd3c2549efc576e08a222263aceff568e0310477abccb"
+      }
+    ],
+    "bancor-fiat-on-ramp/ProvideLiquidityFactory": [
+      {
+        "address": "0xd5A781C588392E12878c30becE7836dfb7150AF6",
+        "kind": "NonProxy",
+        "bytecodeHash": "a381d0d694c23eab9e3a048cac77031d99d187d9bcb0ad31fda9847e90526eb0"
+      }
+    ]
+  },
+  "manifestVersion": "2.2"
+}
