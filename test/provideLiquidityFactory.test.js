@@ -93,13 +93,18 @@ contract("Provide Liquidity", accounts => {
     await FactoryInstance.enterPool({ from: alice });
 
     // Print token balances
+    console.log("")
+    console.log("============================================================");
     console.log("Balance after Entering Pool ------------------------");
-    console.log("ETHBNT Proxy: ", fromWei(await EthBntContract.balanceOf(proxy)));
-    console.log("ETH Proxy: ", fromWei(await EtherContract.balanceOf(proxy)));
-    console.log("BNT Proxy: ", fromWei(await BntContract.balanceOf(proxy)));
-    console.log("ETHBNT Alice: ", fromWei(await EthBntContract.balanceOf(alice)));
-    console.log("ETH Alice: ", fromWei(await EtherContract.balanceOf(alice)));
-    console.log("BNT ALice: ", fromWei(await BntContract.balanceOf(alice)));
+    console.log("ETHBNT, Proxy: ", fromWei(await EthBntContract.balanceOf(proxy)));
+    console.log("BNT, Proxy: ", fromWei(await BntContract.balanceOf(proxy)));
+    console.log("ETH-Token, Proxy: ", fromWei(await EtherContract.balanceOf(proxy)));
+    console.log("ETH, Proxy: ", fromWei(await web3.eth.getBalance(proxy)));
+    console.log('---');
+    console.log("ETHBNT, Alice: ", fromWei(await EthBntContract.balanceOf(alice)));
+    console.log("BNT, ALice: ", fromWei(await BntContract.balanceOf(alice)));
+    console.log("ETH-Token, Alice: ", fromWei(await EtherContract.balanceOf(alice)));
+    console.log("ETH, Alice: ", fromWei(await web3.eth.getBalance(alice)));
 
     // Check token balances
     expect(parseFloat(fromWei(await EthBntContract.balanceOf(proxy)))).to.be.above(0);
@@ -115,20 +120,28 @@ contract("Provide Liquidity", accounts => {
     await FactoryInstance.exitPool(initialBalance, { from: alice });
 
     // Print token balances
+    console.log("")
+    console.log("============================================================");
     console.log("Balance after Exiting Pool ------------------------");
-    console.log("ETHBNT Proxy: ", fromWei(await EthBntContract.balanceOf(proxy)));
-    console.log("ETH Proxy: ", fromWei(await EtherContract.balanceOf(proxy)));
-    console.log("BNT Proxy: ", fromWei(await BntContract.balanceOf(proxy)));
-    console.log("ETHBNT Alice: ", fromWei(await EthBntContract.balanceOf(alice)));
-    console.log("ETH Alice: ", fromWei(await EtherContract.balanceOf(alice)));
-    console.log("BNT ALice: ", fromWei(await BntContract.balanceOf(alice)));
+    console.log("ETHBNT, Proxy: ", fromWei(await EthBntContract.balanceOf(proxy)));
+    console.log("BNT, Proxy: ", fromWei(await BntContract.balanceOf(proxy)));
+    console.log("ETH-Token, Proxy: ", fromWei(await EtherContract.balanceOf(proxy)));
+    console.log("ETH, Proxy: ", fromWei(await web3.eth.getBalance(proxy)));
+    console.log('---');
+    console.log("ETHBNT, Alice: ", fromWei(await EthBntContract.balanceOf(alice)));
+    console.log("BNT, ALice: ", fromWei(await BntContract.balanceOf(alice)));
+    console.log("ETH-Token, Alice: ", fromWei(await EtherContract.balanceOf(alice)));
+    console.log("ETH, Alice: ", fromWei(await web3.eth.getBalance(alice)));
 
     // Check balances
     expect(fromWei(await EthBntContract.balanceOf(alice))).to.equal("0");
     expect(fromWei(await EtherContract.balanceOf(alice))).to.equal("0");
     expect(fromWei(await BntContract.balanceOf(alice))).to.equal("0");
-    expect(parseFloat(fromWei(await EthBntContract.balanceOf(proxy)))).to.equal(0);
-    expect(parseFloat(fromWei(await EtherContract.balanceOf(proxy)))).to.be.above(0);
-    expect(parseFloat(fromWei(await BntContract.balanceOf(proxy)))).to.be.above(0);
+    expect(fromWei(await EthBntContract.balanceOf(proxy))).to.equal("0");
+    expect(fromWei(await EtherContract.balanceOf(proxy))).to.equal("0");
+    expect(fromWei(await BntContract.balanceOf(proxy))).to.equal("0");
+    // Proxy contract should have a little below 5 ether since conversion is not 100% efficient
+    expect(parseFloat(fromWei(await web3.eth.getBalance(proxy)))).to.be.above(4.9);
+    expect(parseFloat(fromWei(await web3.eth.getBalance(proxy)))).to.be.below(5);
   });
 });

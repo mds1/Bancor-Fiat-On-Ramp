@@ -67,7 +67,7 @@ contract ProvideLiquidity is Initializable {
   event EtherWithdrawn(uint256 indexed amount);
 
   // ===============================================================================================
-  //                                      Main Functionality
+  //                                      Initialization
   // ===============================================================================================
 
   modifier onlyUser() {
@@ -88,7 +88,13 @@ contract ProvideLiquidity is Initializable {
     // Approvals
     EtherToken.approve(address(BancorConverter), uint256(-1));
     BntToken.approve(address(BancorConverter), uint256(-1));
+    EtherToken.approve(address(BancorNetwork), uint256(-1));
+    BntToken.approve(address(BancorNetwork), uint256(-1));
   }
+
+  // ===============================================================================================
+  //                                      Entering Pool
+  // ===============================================================================================
 
   /**
    * @notice Swap Ether for Bancor's Ether Token
@@ -158,14 +164,45 @@ contract ProvideLiquidity is Initializable {
     BancorConverter.fund(_amount);
   }
 
+  // ===============================================================================================
+  //                                      Exiting Pool
+  // ===============================================================================================
+
   /**
-   * @notice Exits the pool
+   * @notice Swap all BNT held by this contract for EtherToken
+   */
+  function swapBntForEtherToken() internal {
+    // Define conversion path
+    IERC20[] memory _path = new IERC20[](3);
+    (_path[0], _path[1], _path[2]) = (BntToken, EthBntToken, EtherTokenIERC20);
+
+    // Define other swap parameters
+    uint256 _amount = BntToken.balanceOf(address(this));
+    uint256 _minReturn = 1; // TODO update this
+    address _affiliate = 0x0000000000000000000000000000000000000000;
+    uint256 _fee = 0;
+
+    // Convert token
+    BancorNetwork.claimAndConvert2(_path, _amount, _minReturn, _affiliate, _fee);
+  }
+
+  /**
+   * @notice Exits the pool by redeeming tokens for the underlying and converting
+   * them to ETH. We keep the ETH in this contract in case user wants to
+   * enter a different liquidity pool next
    * @param _amount Amount of pool tokens to redeem
    */
   function exitPool(uint256 _amount) external onlyUser {
-    // Redeem them for the underlying
+    // Redeem pool tokens for the underlying
     emit PoolExited(_amount);
     BancorConverter.liquidate(_amount);
+
+    // Convert all BNT to EtherToken
+    swapBntForEtherToken();
+
+    // Convert all EtherToken to ETH
+    uint256 _etherTokenBalance = EtherToken.balanceOf(address(this));
+    EtherToken.withdraw(_etherTokenBalance);
   }
 
   /**

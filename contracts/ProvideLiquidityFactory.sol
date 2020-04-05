@@ -133,6 +133,10 @@ contract ProvideLiquidityFactory is Ownable, GSNRecipient {
   function enterPool() external {
     // Get address of caller's proxy contract
     address _proxy = getContract[_msgSender()];
+    require(
+      _proxy != 0x0000000000000000000000000000000000000000,
+      "ProvideLiquidityFactory: Caller does not have a proxy deployed"
+    );
 
     // Enter pool
     ProvideLiquidity Proxy = ProvideLiquidity(payable(_proxy));
@@ -146,6 +150,10 @@ contract ProvideLiquidityFactory is Ownable, GSNRecipient {
   function exitPool(uint256 _amount) external {
     // Get address of caller's proxy contract
     address _proxy = getContract[_msgSender()];
+    require(
+      _proxy != 0x0000000000000000000000000000000000000000,
+      "ProvideLiquidityFactory: Caller does not have a proxy deployed"
+    );
 
     // Exit pool
     ProvideLiquidity Proxy = ProvideLiquidity(payable(_proxy));
@@ -160,6 +168,10 @@ contract ProvideLiquidityFactory is Ownable, GSNRecipient {
   function withdrawTokens(address _tokenAddress, address _recipient) external {
     // Get address of caller's proxy contract
     address _proxy = getContract[_msgSender()];
+    require(
+      _proxy != 0x0000000000000000000000000000000000000000,
+      "ProvideLiquidityFactory: Caller does not have a proxy deployed"
+    );
 
     // Withdraw tokens
     ProvideLiquidity Proxy = ProvideLiquidity(payable(_proxy));
@@ -173,9 +185,32 @@ contract ProvideLiquidityFactory is Ownable, GSNRecipient {
   function withdrawEther(address _recipient) external {
     // Get address of caller's proxy contract
     address _proxy = getContract[_msgSender()];
+    require(
+      _proxy != 0x0000000000000000000000000000000000000000,
+      "ProvideLiquidityFactory: Caller does not have a proxy deployed"
+    );
 
-    // Withdraw tokens
+    // Withdraw Ether
     ProvideLiquidity Proxy = ProvideLiquidity(payable(_proxy));
+    Proxy.withdrawEther(_recipient);
+  }
+
+  /**
+   * @notice Helper function to withdraw from a pool and transfer all ETH
+   * in one transaction
+   */
+  function exitAndWithdraw(uint256 _amount, address _recipient) external {
+    address _proxy = getContract[_msgSender()];
+    require(
+      _proxy != 0x0000000000000000000000000000000000000000,
+      "ProvideLiquidityFactory: Caller does not have a proxy deployed"
+    );
+
+    // Exit pool
+    ProvideLiquidity Proxy = ProvideLiquidity(payable(_proxy));
+    Proxy.exitPool(_amount);
+
+    // Withdraw Ether
     Proxy.withdrawEther(_recipient);
   }
 

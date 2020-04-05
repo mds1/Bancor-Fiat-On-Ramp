@@ -105,7 +105,19 @@ contract("Provide Liquidity", accounts => {
 
     // Enter liquidity pool ------------------------------------------------
     // Send Ether to contract (sent from Bancor but used to represent Wyre)
-    await send.ether(bancor, provideLiquidity, ether("5"));
+    await send.ether(bancor, provideLiquidity, ether('5'));
+    console.log("")
+    console.log("============================================================");
+    console.log("Balance before Entering Pool ------------------------");
+    console.log("ETHBNT, Contract: ", fromWei(await EthBntContract.balanceOf(provideLiquidity)));
+    console.log("BNT, Contract: ", fromWei(await BntContract.balanceOf(provideLiquidity)));
+    console.log("ETH-Token, Contract: ", fromWei(await EtherContract.balanceOf(provideLiquidity)));
+    console.log("ETH, Contract: ", fromWei(await web3.eth.getBalance(provideLiquidity)));
+    console.log('---');
+    console.log("ETHBNT, Alice: ", fromWei(await EthBntContract.balanceOf(alice)));
+    console.log("BNT, ALice: ", fromWei(await BntContract.balanceOf(alice)));
+    console.log("ETH-Token, Alice: ", fromWei(await EtherContract.balanceOf(alice)));
+    console.log("ETH, Alice: ", fromWei(await web3.eth.getBalance(alice)));
 
     // Enter pool
     await ProvideLiquidityContract.enterPool({ from: alice, gasPrice: "1" });
@@ -116,13 +128,18 @@ contract("Provide Liquidity", accounts => {
 
     // Check balances of contract, ensure alice never receives tokens
     // TODO why does contract still have EtherTokens and BNT? Possibly ganache bug
+    console.log("")
+    console.log("============================================================");
     console.log("Balance after Entering Pool ------------------------");
-    console.log("ETHBNT Contract: ", fromWei(await EthBntContract.balanceOf(provideLiquidity)));
-    console.log("ETH Contract: ", fromWei(await EtherContract.balanceOf(provideLiquidity)));
-    console.log("BNT Contract: ", fromWei(await BntContract.balanceOf(provideLiquidity)));
-    console.log("ETHBNT Alice: ", fromWei(await EthBntContract.balanceOf(alice)));
-    console.log("ETH Alice: ", fromWei(await EtherContract.balanceOf(alice)));
-    console.log("BNT ALice: ", fromWei(await BntContract.balanceOf(alice)));
+    console.log("ETHBNT, Contract: ", fromWei(await EthBntContract.balanceOf(provideLiquidity)));
+    console.log("BNT, Contract: ", fromWei(await BntContract.balanceOf(provideLiquidity)));
+    console.log("ETH-Token, Contract: ", fromWei(await EtherContract.balanceOf(provideLiquidity)));
+    console.log("ETH, Contract: ", fromWei(await web3.eth.getBalance(provideLiquidity)));
+    console.log('---');
+    console.log("ETHBNT, Alice: ", fromWei(await EthBntContract.balanceOf(alice)));
+    console.log("BNT, ALice: ", fromWei(await BntContract.balanceOf(alice)));
+    console.log("ETH-Token, Alice: ", fromWei(await EtherContract.balanceOf(alice)));
+    console.log("ETH, Alice: ", fromWei(await web3.eth.getBalance(alice)));
     // expect(fromWei(await BntContract.balanceOf(provideLiquidity))).to.equal('0')
     // expect(fromWei(await EtherContract.balanceOf(provideLiquidity))).to.equal('0')
 
@@ -134,18 +151,29 @@ contract("Provide Liquidity", accounts => {
     await ProvideLiquidityContract.exitPool(initialBalance, { from: alice });
 
     // Check balances
+    console.log("")
+    console.log("============================================================");
     console.log("Balance after Exiting Pool ------------------------");
-    console.log("ETHBNT Contract: ", fromWei(await EthBntContract.balanceOf(provideLiquidity)));
-    console.log("ETH Contract: ", fromWei(await EtherContract.balanceOf(provideLiquidity)));
-    console.log("BNT Contract: ", fromWei(await BntContract.balanceOf(provideLiquidity)));
-    console.log("ETHBNT Alice: ", fromWei(await EthBntContract.balanceOf(alice)));
-    console.log("ETH Alice: ", fromWei(await EtherContract.balanceOf(alice)));
-    console.log("BNT ALice: ", fromWei(await BntContract.balanceOf(alice)));
+    console.log("ETHBNT, Contract: ", fromWei(await EthBntContract.balanceOf(provideLiquidity)));
+    console.log("BNT, Contract: ", fromWei(await BntContract.balanceOf(provideLiquidity)));
+    console.log("ETH-Token, Contract: ", fromWei(await EtherContract.balanceOf(provideLiquidity)));
+    console.log("ETH, Contract: ", fromWei(await web3.eth.getBalance(provideLiquidity)));
+    console.log('---');
+    console.log("ETHBNT, Alice: ", fromWei(await EthBntContract.balanceOf(alice)));
+    console.log("BNT, ALice: ", fromWei(await BntContract.balanceOf(alice)));
+    console.log("ETH-Token, Alice: ", fromWei(await EtherContract.balanceOf(alice)));
+    console.log("ETH, Alice: ", fromWei(await web3.eth.getBalance(alice)));
 
-    expect(parseFloat(fromWei(await EthBntContract.balanceOf(alice)))).to.equal( 0 );
+    // Balances of all tokens should be 0
+    expect(parseFloat(fromWei(await EthBntContract.balanceOf(alice)))).to.equal(0);
     expect(parseFloat(fromWei(await EthBntContract.balanceOf(provideLiquidity)))).to.equal(0);
-    expect(parseFloat(fromWei(await EtherContract.balanceOf(provideLiquidity)))).to.be.above(0);
-    expect(parseFloat(fromWei(await BntContract.balanceOf(provideLiquidity)))).to.be.above(0);
+    expect(parseFloat(fromWei(await BntContract.balanceOf(provideLiquidity)))).to.equal(0);
+    expect(parseFloat(fromWei(await EtherContract.balanceOf(provideLiquidity)))).to.equal(0);
+    // Proxy contract should have a little below 5 ether since conversion is not 100% efficient
+    expect(parseFloat(fromWei(await web3.eth.getBalance(provideLiquidity)))).to.be.above(4.9);
+    expect(parseFloat(fromWei(await web3.eth.getBalance(provideLiquidity)))).to.be.below(5);
+
+
   });
 
   it("allows stray ERC20 tokens to be withdrawn", async () => {
