@@ -41,10 +41,8 @@ const createContract = (address, name, provider) => {
 async function getGasPrice(speed = 'fast') {
   /* eslint-disable no-console */
   console.log('Querying EthGasStation API...');
-  const response = await jsonFetch('https://ethgasstation.info/json/ethgasAPI.json');
+  const gasData = await jsonFetch('https://ethgasstation.info/json/ethgasAPI.json');
 
-  console.log(response);
-  const gasData = response;
   let gasPrice; // to convert to gwei, later divide by 10, source: https://docs.ethgasstation.info/
 
   if (speed === 'safeLow' || speed === 'average') {
@@ -122,7 +120,7 @@ export async function getProxy({ commit }, userAddress) {
 }
 
 export async function checkBalances({ commit, state }, proxyAddress) {
-  console.log('Checking for balance updates...');
+  console.log('Checking for balance updates...'); // eslint-disable-line no-console
   const ethersProvider = new ethers.providers.Web3Provider(state.provider);
   let ethBalance;
   let ethTokenBalance;

@@ -18,6 +18,7 @@
             class="input"
             filled
             label="Deposit Amount"
+            prefix="$"
           />
         </q-card-section>
         <q-card-section>
@@ -76,6 +77,49 @@
           </div>
         </q-card-section>
       </q-card>
+
+      <!-- POOL ENTERED -->
+      <q-dialog
+        v-model="isEntryComplete"
+        persistent
+      >
+        <q-card class="text-center q-pa-lg">
+          <q-card-section>
+            <h4 class="row justify-center items-center">
+              <q-icon
+                left
+                name="fas fa-check"
+                class="setup-icon vertical-middle"
+              />
+              <span>You Entered the Pool!</span>
+            </h4>
+          </q-card-section>
+
+          <q-card-section>
+            <div>
+              You have successfully deposited funds into the liquidity pool!
+            </div>
+            <p class="q-mt-lg">
+              <img
+                src="statics/graphics/undraw_celebration_0jvk.png"
+                style="width:30vw;max-width:225px;"
+              >
+            </p>
+            <div>
+              Now sit back and relax as you earn some money.
+            </div>
+          </q-card-section>
+
+          <q-card-actions align="right">
+            <q-btn
+              v-close-popup
+              flat
+              label="Ok"
+              :color="$q.dark.isActive ? 'white' : 'primary'"
+            />
+          </q-card-actions>
+        </q-card>
+      </q-dialog>
     </div>
   </div>
 </template>
@@ -94,6 +138,7 @@ export default {
     return {
       isDepositLoading: false,
       isEntryLoading: false,
+      isEntryComplete: false,
       isWaitingForPurchase: false,
       contractAddress: undefined,
       pools: [
@@ -107,10 +152,16 @@ export default {
 
   computed: {
     ...mapState({
+      // User account info
       signer: (state) => state.main.signer,
       userAddress: (state) => state.main.userAddress,
       proxyAddress: (state) => state.main.proxy.address,
+      // User balances
       ethBalance: (state) => state.main.proxy.ethBalance,
+      bntBalance: (state) => state.main.proxy.bntBalance,
+      ethTokenBalance: (state) => state.main.proxy.ethTokenBalance,
+      ethBntBalance: (state) => state.main.proxy.ethBntBalance,
+      // Helpers
       gasPrice: (state) => state.main.gasPrice,
       FactoryContract: (state) => state.main.contracts.Factory,
     }),
@@ -167,7 +218,7 @@ export default {
       }
     },
 
-    enterPool() {
+    async enterPool() {
       /* eslint-disable no-console */
       this.isEntryLoading = true;
       console.log('Initializing pool entry...');
@@ -189,7 +240,8 @@ export default {
           .once('receipt', async (receipt) => {
             console.log('Transaction receipt: ', receipt);
             await this.$store.dispatch('main/checkBalances', this.proxyAddress);
-            this.isDeployed = true;
+            this.isEntryLoading = false;
+            this.isEntryComplete = true;
           })
           .catch((err) => {
             console.log('Something went wrong entering pool. See the error message below.');

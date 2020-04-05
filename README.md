@@ -51,7 +51,11 @@ This process occurs whenever a user wants to enter into a liquidity pool:
    1. *This is done by calling `Factory.exitPool(amount)`, where `amount` is the number of pool tokens to redeem. Again, we make this call using the GSN provider*
 2. Once transaction is complete, the underlying tokens are held by the proxy contract.
    1. *The `withdrawTokens(tokenAddress)` and `withdrawEther()` functions of the proxy contract can be used to withdraw funds held by the proxy contract to an arbitrary address
-   2. *Suggested improvement: Enable access to these functions via the factory contract to add GSN support, since right now the only way to call these is by having ETH for gas and directly calling those functions on the proxy*
+
+**NOTE:** The most recent versions of `ProvideLiquidity.sol` `ProvideLiquidityFactory.sol` in this repository are not the same versions as the ones deployed on the mainnet. The differences are as follows:
+
+- `ProvideLiquidityFactory.sol`:  The one on the mainnet is missing the `withdrawTokens()` and `withdrawEther()` functions. This means that for the currently deployed version, the only way to withdraw Ether and tokens from the proxy contract is to have Ether and call it directly.
+- `ProvideLiquidity.sol`: The one on the mainnet is missing the `_recipient` inputs in the `withdrawTokens()` and `withdrawEther()` functions. This means that for the currently deployed version, the only way to withdraw to a bank account is to transfer tokens to your wallet and manually withdraw them via an exchange.
 
 ## Development Setup
 

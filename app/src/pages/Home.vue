@@ -31,7 +31,7 @@
       </div>
       <div v-else>
         <div
-          v-if="!proxyAddress || proxyAddress == '0x0000000000000000000000000000000000000000'"
+          v-if="!proxyAddress || proxyAddress === '0x0000000000000000000000000000000000000000'"
           class="row justify-center "
         >
           <deploy-proxy />
@@ -44,6 +44,8 @@
         </div>
       </div>
     </div>
+
+    <user-account-info v-if="proxyAddress && proxyAddress !== '0x0000000000000000000000000000000000000000'" />
   </q-page>
 </template>
 
@@ -52,6 +54,7 @@ import { mapState } from 'vuex';
 import ConnectWallet from 'components/ConnectWallet';
 import DeployProxy from 'components/DeployProxy';
 import DepositWithWyre from 'components/DepositWithWyre';
+import UserAccountInfo from 'components/UserAccountInfo';
 
 export default {
   name: 'Home',
@@ -60,6 +63,7 @@ export default {
     ConnectWallet,
     DeployProxy,
     DepositWithWyre,
+    UserAccountInfo,
   },
 
   computed: {

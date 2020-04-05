@@ -23,8 +23,10 @@
           </div>
           <div v-else>
             Since this is your first visit, we just need to finish setting up your account.
-            <p class="text-caption text-italic">
-              This should only take about a minute, as we deploy some code just for you.
+            <p class="text-caption text-italic text-justify q-mt-md">
+              This should only take about a minute, as we deploy a proxy contract for you.
+              This proxy contract enables you to enter and exit Bancor Liquidity pools
+              without having ETH for gas by utilizing the Gas Station Network.
             </p>
           </div>
           <p class="q-my-lg">
