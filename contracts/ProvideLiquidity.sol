@@ -180,24 +180,26 @@ contract ProvideLiquidity is Initializable {
   // ===============================================================================================
 
   /**
-   * @notice Forwards all tokens to owner
-   * @dev This is useful if tokens get stuck
+   * @notice Transfers all tokens of the input adress to the recipient. This is
+   * useful if you want to withdraw any tokens to your wallet, or if tokens
+   * were accidentally sent to this contract they can now be withdrawn.
    * @param _tokenAddress address of token to send
+   * @param _recipient address to send tokens to
    */
-  function withdrawTokens(address _tokenAddress) external onlyUser {
+  function withdrawTokens(address _tokenAddress, address _recipient) external onlyUser {
     IERC20 _token = IERC20(_tokenAddress);
     uint256 _balance = _token.balanceOf(address(this));
     emit TokensWithdrawn(_balance, _tokenAddress);
-    _token.transfer(user, _balance);
+    _token.transfer(_recipient, _balance);
   }
 
   /**
-   * @notice Forwards all Ether to owner
-   * @dev This is useful if Ether gets stuck
+   * @notice Transfers all Ether to the specified address
+   * @param _recipient address to send tokens to
    */
-  function withdrawEther() external onlyUser {
+  function withdrawEther(address _recipient) external onlyUser {
     uint256 _balance = address(this).balance;
     emit EtherWithdrawn(_balance);
-    payable(user).transfer(_balance);
+    payable(_recipient).transfer(_balance);
   }
 }

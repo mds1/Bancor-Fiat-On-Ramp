@@ -147,9 +147,36 @@ contract ProvideLiquidityFactory is Ownable, GSNRecipient {
     // Get address of caller's proxy contract
     address _proxy = getContract[_msgSender()];
 
-    // Enter pool
+    // Exit pool
     ProvideLiquidity Proxy = ProvideLiquidity(payable(_proxy));
     Proxy.exitPool(_amount);
+  }
+
+  /**
+   * @notice Withdraw your tokens to the specified address
+   * @param _tokenAddress address of token to send
+   * @param _recipient address to send tokens to
+   */
+  function withdrawTokens(address _tokenAddress, address _recipient) external {
+    // Get address of caller's proxy contract
+    address _proxy = getContract[_msgSender()];
+
+    // Withdraw tokens
+    ProvideLiquidity Proxy = ProvideLiquidity(payable(_proxy));
+    Proxy.withdrawTokens(_tokenAddress, _recipient);
+  }
+
+  /**
+   * @notice Withdraw your Ether to the specified address
+   * @param _recipient address to send tokens to
+   */
+  function withdrawEther(address _recipient) external {
+    // Get address of caller's proxy contract
+    address _proxy = getContract[_msgSender()];
+
+    // Withdraw tokens
+    ProvideLiquidity Proxy = ProvideLiquidity(payable(_proxy));
+    Proxy.withdrawEther(_recipient);
   }
 
   // ===============================================================================================
