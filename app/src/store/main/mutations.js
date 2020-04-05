@@ -29,6 +29,10 @@ export function setProxyData(state, proxyData) {
   state.proxy.ethTokenBalance = proxyData.ethTokenBalance;
 }
 
+export function setProxyAddress(state, address) {
+  state.proxy.address = address;
+}
+
 export function setGasPrice(state, gasPrice) {
   state.gasPrice = gasPrice;
 }

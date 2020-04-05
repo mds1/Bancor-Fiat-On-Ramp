@@ -4,16 +4,16 @@
   "proxies": {
     "bancor-fiat-on-ramp/ProvideLiquidity": [
       {
-        "address": "0x9cbD6867E1245Ca6fAd3A702764193de29D9Ec95",
+        "address": "0x0682b17E5877f9a53a7051CFbA010E6D4D45659f",
         "kind": "NonProxy",
-        "bytecodeHash": "6e7f1a87edd9e4b1bcabd3c2549efc576e08a222263aceff568e0310477abccb"
+        "bytecodeHash": "51eda604b665057328defc433402867a0413dd70eb4f0ccce4d2f2f40cc216b3"
       }
     ],
     "bancor-fiat-on-ramp/ProvideLiquidityFactory": [
       {
-        "address": "0xd5A781C588392E12878c30becE7836dfb7150AF6",
+        "address": "0x0DDe1cAc091d4020e2BCAF87AD1DD158a41c6D05",
         "kind": "NonProxy",
-        "bytecodeHash": "a381d0d694c23eab9e3a048cac77031d99d187d9bcb0ad31fda9847e90526eb0"
+        "bytecodeHash": "3aaf368efa1020286c69d9e60de0a9cf22308f3438c18c668a53d760eaf02368"
       }
     ]
   },
