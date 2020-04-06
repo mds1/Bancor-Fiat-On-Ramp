@@ -1,6 +1,7 @@
 # Bancor Fiat On Ramp
 
-[Video demo](https://youtu.be/QUY1spAvXWk)
+- [Live site](https://bancor-fiat-on-ramp.web.app/) (uses real funds on the mainnet)
+- [Video demo](https://youtu.be/QUY1spAvXWk)
 
 This tool enables an easy Fiat on/off ramp for entering/exiting Bancor liquidity pools. Features:
 
