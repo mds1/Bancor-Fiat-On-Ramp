@@ -1,5 +1,7 @@
 # Bancor Fiat On Ramp
 
+[Video demo](https://youtu.be/QUY1spAvXWk)
+
 This tool enables an easy Fiat on/off ramp for entering/exiting Bancor liquidity pools. Features:
 
 - The user does not need to have a wallet setup
