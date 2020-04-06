@@ -4,6 +4,7 @@ This tool enables an easy Fiat on/off ramp for entering/exiting Bancor liquidity
 
 - The user does not need to have a wallet setup
 - Gas Station Network (GSN) support so the user does not need Ether for gas
+- Supports deposits from users in 43 US states and nearly 30 countries. (Details about supported regions can be found [here](https://support.sendwyre.com/en/articles/1863574-geographic-restrictions) and [here](https://blog.sendwyre.com/wyre-launches-international-support-fa8986f47fb1))
 
 ## Workflow
 
@@ -42,8 +43,9 @@ This process occurs whenever a user wants to enter into a liquidity pool:
 7. User signs the transaction which is relayed via the GSN
    1. *Relaying is done using the same GSN provider mentioned above*
    2. *The specific function the user calls is `Factory.enterPool()`. Why do we call this on the factory contract instead of their proxy? The reason is because the GSN requires to you to fund the `RelayHub` for each contract you want to pay gas for. Those funds are then used to pay gas. It would be  inefficient and inconvenient to fund `RelayHub` for another contract every time a new proxy contract is deployed. Instead, we enable users to interact with their proxy through the Factory contract, and the factory contract will look up the caller's proxy address. It's worth nothing that if a user does have ETH for gas, they can choose to interact with their proxy directly*
+   3. *Fix: Fix the `enterPool` function in `ProvideLiquidity.sol` to maximize the amount of ETH and BNT are exchanged for ETHBNT pool tokens.*
 8. Once the transaction is complete, the user has successfully entered the liquidity pool and pool tokens are held by their proxy contract.
-   1. *Pool tokens are not sent back to the user because then there would be no way for a user to exit the liquidity pool unless they had ETH for gas. Only Dai and Chai enable approval by signature via their `permit()` function, but all other ERC20s require the user to have ETH to directly call the `permit()` function themselves*
+   1. *Pool tokens are not sent back to the user because then there would be no way for a user to exit the liquidity pool unless they had ETH for gas. Only Dai and Chai enable approval by signature via their `permit()` function, but all other ERC20s require the user to have ETH to directly call the `approve()` function themselves*
 
 ### Leaving Liquidity Pool
 
@@ -138,3 +140,24 @@ More information on deploying and upgrading contracts with the OpenZeppelin CLI 
 - [OpenZeppelin Documentation](https://docs.openzeppelin.com/openzeppelin/)
 - [Command Line Interface (CLI)](https://docs.openzeppelin.com/cli/2.8/)
 - [Guide: Full start-to-finish OpenZeppelin workflow for CLI deployment and upgrades](https://forum.openzeppelin.com/t/guide-full-start-to-finish-openzeppelin-workflow-for-cli-deployment-and-upgrades/2191)
+
+### Off-Ramp Setup
+
+For users to off-ramp into their bank accounts, they will need to link to Wyre. This will
+require Bancor to complete their partnership onboarding which starts by completing
+[this form](https://wyreinc.typeform.com/to/tpSSHL).
+
+Afterwards, the documentation for integrating the ACH widget starts
+[here](https://docs.sendwyre.com/docs/payment-method-overview). Once a bank account
+is linked, a liquidation address can be generated for that payment method using
+[this](https://docs.sendwyre.com/v3/docs/attach-blockchain-to-payment-method)
+API endpoint. So the withdrawal process for a user would be as follows:
+
+1. User completes KYC/AML onboarding process with Wyre to link bank account
+2. Bancor uses the linked endpoint to generate a liquidation address for that bank account
+3. Populate the address field of the "Exit the Pool" box with this liquidation address
+4. When "Exit Pool" is clicked, the pool token will be swapped for the underlying tokens, which all then be swapped for ETH. This ETH will then be transferred to the user's liquidation address, where Wyre will automatically convert it to fiat and send it to their bank account.
+
+An alternative approach is to use Wyre's
+[Instant Payouts to Debit Card](https://docs.sendwyre.com/docs/wyre-push-to-debit-card),
+which is not yet publicly available.

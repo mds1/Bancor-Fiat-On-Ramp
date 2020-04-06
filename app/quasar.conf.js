@@ -25,12 +25,12 @@ module.exports = function (ctx) {
       // 'roboto-font-latin-ext', // this or either 'roboto-font', NEVER both!
 
       'roboto-font', // optional, you are not bound to it
-      // 'material-icons', // optional, you are not bound to it
+      'material-icons', // optional, you are not bound to it
     ],
 
     // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-framework
     framework: {
-      iconSet: 'fontawesome-v5', // Quasar icon set
+      iconSet: 'material-icons', // Quasar icon set
       lang: 'en-us', // Quasar language pack
 
       // Possible values for "all":
