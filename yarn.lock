@@ -312,10 +312,10 @@
   resolved "https://registry.yarnpkg.com/@openzeppelin/contracts-ethereum-package/-/contracts-ethereum-package-2.5.0.tgz#cfb4b91f8132edde7e04bcd032575d4c6b544f4a"
   integrity sha512-14CijdTyy4Y/3D3UUeFC2oW12nt1Yq1M8gFOtkuODEvSYPe3YSAKnKyhUeGf0UDNCZzwfGr15KdiFK6AoJjoSQ==
 
-"@openzeppelin/contracts@^3.0.0-rc.0":
-  version "3.0.0-rc.0"
-  resolved "https://registry.yarnpkg.com/@openzeppelin/contracts/-/contracts-3.0.0-rc.0.tgz#6cc5128f509b6310668547899a4115f8512c32ff"
-  integrity sha512-Ts7h4/5tNiRN2iiH10Mp+6CgmK/PETDHYIJ/tpUrXgGjWR51T/Dr8kxa41GeHHhmAsuo+CkcuG9L4di6qth/Mw==
+"@openzeppelin/contracts@^4.4.2":
+  version "4.4.2"
+  resolved "https://registry.yarnpkg.com/@openzeppelin/contracts/-/contracts-4.4.2.tgz#4e889c9c66e736f7de189a53f8ba5b8d789425c2"
+  integrity sha512-NyJV7sJgoGYqbtNUWgzzOGW4T6rR19FmX1IJgXGdapGPWsuMelGJn9h03nos0iqfforCbCB0iYIR0MtIuIFLLw==
 
 "@openzeppelin/fuzzy-solidity-import-parser@^0.1.2":
   version "0.1.2"
